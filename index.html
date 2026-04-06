@@ -10,7 +10,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Sans KR', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .logo { position: fixed; top: 30px; left: 35px; font-size: 18px; font-weight: 900; letter-spacing: 2px; line-height: 1.2; z-index: 100; }
         #start-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 1s ease; }
         .tagline { font-size: 34px; font-weight: 700; margin-bottom: 50px; letter-spacing: 1px; line-height: 1.6; }
         .logo-btn { width: 150px; height: 150px; border-radius: 50%; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; position: relative; overflow: hidden; padding: 0; }
@@ -19,6 +18,10 @@
         .logo-btn:hover img { box-shadow: 0 0 30px rgba(102,126,234,0.4); }
         .logo-btn:active { transform: scale(0.95); }
         .logo-btn.rolling { animation: shake 0.5s ease; }
+        .logo-btn-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+        .pulse-ring { position: absolute; width: 170px; height: 170px; border-radius: 50%; border: 2px solid rgba(102,126,234,0.3); animation: pulse 2s ease-out infinite; pointer-events: none; }
+        .pulse-ring:nth-child(2) { animation-delay: 0.6s; }
+        .pulse-ring:nth-child(3) { animation-delay: 1.2s; }
         .start-hint { margin-top: 24px; font-size: 14px; color: #666; letter-spacing: 3px; text-transform: uppercase; }
         #result-screen { display: none; flex-direction: column; align-items: center; text-align: center; padding: 20px; max-width: 1000px; width: 100%; }
         .cards-row { display: flex; gap: 30px; width: 100%; justify-content: center; flex-wrap: wrap; }
@@ -28,7 +31,7 @@
         .card-emoji { font-size: 52px; margin-bottom: 18px; }
         .card-label { font-size: 15px; color: #667eea; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; font-weight: 700; }
         .card-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; line-height: 1.4; }
-        .card-desc { font-size: 15px; color: #999; line-height: 1.7; }
+        .card-desc { font-size: 15px; color: #999; line-height: 1.7; max-width: 320px; margin: 0 auto; word-break: keep-all; overflow-wrap: break-word; }
         .music-artist { font-size: 15px; color: #999; margin-top: 6px; }
         .bottom-area { margin-top: 40px; opacity: 0; animation: fadeIn 0.5s ease 0.6s forwards; display: flex; flex-direction: column; align-items: center; gap: 24px; }
         .add-prompt { font-size: 14px; color: #777; letter-spacing: 0.3px; line-height: 1.6; padding: 16px 30px; border: 1px dashed rgba(255,255,255,0.12); border-radius: 16px; background: rgba(255,255,255,0.02); }
@@ -41,16 +44,21 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-15deg) scale(1.1)} 40%{transform:rotate(15deg) scale(1.1)} 60%{transform:rotate(-10deg) scale(1.05)} 80%{transform:rotate(10deg) scale(1.05)} }
-        @media (min-width:768px) and (orientation:landscape) { body{overflow-y:auto} .tagline{font-size:42px;margin-bottom:40px} .logo-btn{width:180px;height:180px} #result-screen{padding:20px} .cards-row{flex-wrap:nowrap;gap:36px} .start-hint{font-size:16px;margin-top:30px} .card-title{font-size:30px} .card-label{font-size:16px} }
-        @media (max-width:600px) { .tagline{font-size:28px;margin-bottom:35px} .logo-btn{width:120px;height:120px} .card-title{font-size:22px} .result-card{padding:30px 24px} .cards-row{flex-direction:column;align-items:center;gap:20px} .reroll-btn{padding:18px 44px;font-size:16px} }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.5); opacity: 0; } }
+        @media (min-width:768px) and (orientation:landscape) { body{overflow-y:auto} .tagline{font-size:42px;margin-bottom:40px} .logo-btn{width:180px;height:180px} .pulse-ring{width:200px;height:200px} #result-screen{padding:20px} .cards-row{flex-wrap:nowrap;gap:36px} .start-hint{font-size:16px;margin-top:30px} .card-title{font-size:30px} .card-label{font-size:16px} }
+        @media (max-width:600px) { .tagline{font-size:28px;margin-bottom:35px} .logo-btn{width:120px;height:120px} .pulse-ring{width:140px;height:140px} .card-title{font-size:22px} .result-card{padding:30px 24px} .cards-row{flex-direction:column;align-items:center;gap:20px} .reroll-btn{padding:18px 44px;font-size:16px} .card-desc{max-width:260px} }
     </style>
 </head>
 <body>
-    <div class="logo">OFF '<br>REST</div>
     <div class="bg-glow glow-1"></div><div class="bg-glow glow-2"></div>
     <div id="start-screen">
         <div class="tagline">Find your rest<br>Feel your rest</div>
-        <button class="logo-btn" id="diceBtn" onclick="roll()"><img src="/icons/icon-512.png" alt="OFFREST"></button>
+        <div class="logo-btn-wrap">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <button class="logo-btn" id="diceBtn" onclick="roll()"><img src="/icons/icon-512.png" alt="OFFREST"></button>
+        </div>
         <div class="start-hint">TAP TO OFFREST</div>
     </div>
     <div id="result-screen">
