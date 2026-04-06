@@ -8,181 +8,446 @@
     <title>OFFREST</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Sans KR', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        #start-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 1s ease; }
-        .tagline { font-size: 34px; font-weight: 700; margin-bottom: 50px; letter-spacing: 1px; line-height: 1.6; }
-        .logo-btn { width: 150px; height: 150px; border-radius: 50%; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; position: relative; overflow: hidden; padding: 0; }
-        .logo-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transition: all 0.3s ease; }
-        .logo-btn:hover { transform: scale(1.08); }
-        .logo-btn:hover img { box-shadow: 0 0 30px rgba(102,126,234,0.4); }
-        .logo-btn:active { transform: scale(0.95); }
-        .logo-btn.rolling { animation: shake 0.5s ease; }
-        .logo-btn-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
-        .pulse-ring { position: absolute; width: 170px; height: 170px; border-radius: 50%; border: 2px solid rgba(102,126,234,0.3); animation: pulse 2s ease-out infinite; pointer-events: none; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 1px, transparent 2px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 1px, transparent 2px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+            border-radius: 50%;
+            opacity: 0.2;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.1; }
+            50% { transform: translateY(-50px) translateX(30px); opacity: 0.3; }
+        }
+
+        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; top: 20%; animation: float 8s ease-in-out infinite; }
+        .particle:nth-child(2) { width: 6px; height: 6px; left: 80%; top: 10%; animation: float 10s ease-in-out infinite 1s; }
+        .particle:nth-child(3) { width: 3px; height: 3px; left: 20%; top: 80%; animation: float 9s ease-in-out infinite 2s; }
+        .particle:nth-child(4) { width: 5px; height: 5px; left: 70%; top: 70%; animation: float 11s ease-in-out infinite 1.5s; }
+        .particle:nth-child(5) { width: 4px; height: 4px; left: 30%; top: 40%; animation: float 7s ease-in-out infinite 2.5s; }
+        .particle:nth-child(6) { width: 3px; height: 3px; left: 60%; top: 30%; animation: float 12s ease-in-out infinite 0.5s; }
+        .particle:nth-child(7) { width: 5px; height: 5px; left: 15%; top: 60%; animation: float 8.5s ease-in-out infinite 3s; }
+        .particle:nth-child(8) { width: 4px; height: 4px; left: 85%; top: 50%; animation: float 10.5s ease-in-out infinite 1.2s; }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .start-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .tagline {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 60px;
+            line-height: 1.4;
+        }
+
+        .logo-btn-wrap { position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto 40px; }
+        .logo-button {
+            width: 150px; height: 150px; border-radius: 50%; background: transparent; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; position: relative; overflow: hidden; padding: 0; z-index: 2;
+        }
+        .logo-button:hover { transform: scale(1.08); }
+        .logo-button:hover img { box-shadow: 0 0 30px rgba(102,126,234,0.4); }
+        .logo-button:active { transform: scale(0.95); }
+        .logo-button.rolling { animation: shake 0.5s ease; }
+        .pulse-ring {
+            position: absolute; width: 170px; height: 170px; border-radius: 50%;
+            border: 2px solid rgba(102,126,234,0.3); animation: pulse 2s ease-out infinite; pointer-events: none;
+        }
         .pulse-ring:nth-child(2) { animation-delay: 0.6s; }
         .pulse-ring:nth-child(3) { animation-delay: 1.2s; }
-        .start-hint { margin-top: 24px; font-size: 14px; color: #666; letter-spacing: 3px; text-transform: uppercase; }
-        #result-screen { display: none; flex-direction: column; align-items: center; text-align: center; padding: 20px; max-width: 1000px; width: 100%; }
-        .cards-row { display: flex; gap: 30px; width: 100%; justify-content: center; flex-wrap: wrap; }
-        .result-card { background: linear-gradient(145deg, #1a1a2e, #0f0f1a); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 45px 35px; flex: 1; min-width: 300px; max-width: 460px; opacity: 0; transform: translateY(30px); }
-        .result-card.show { animation: slideUp 0.6s ease forwards; }
-        .result-card.delay { animation-delay: 0.2s; }
-        .card-emoji { font-size: 52px; margin-bottom: 18px; }
-        .card-label { font-size: 15px; color: #667eea; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; font-weight: 700; }
-        .card-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; line-height: 1.4; }
-        .card-desc { font-size: 15px; color: #999; line-height: 1.7; margin: 0 auto; word-break: keep-all; overflow-wrap: break-word; }
-        .music-artist { font-size: 15px; color: #999; margin-top: 6px; }
-        .bottom-area { margin-top: 40px; opacity: 0; animation: fadeIn 0.5s ease 0.6s forwards; display: flex; flex-direction: column; align-items: center; gap: 24px; }
-        .add-prompt { font-size: 14px; color: #777; letter-spacing: 0.3px; line-height: 1.6; padding: 16px 30px; border: 1px dashed rgba(255,255,255,0.12); border-radius: 16px; background: rgba(255,255,255,0.02); }
-        .reroll-btn { padding: 20px 52px; border-radius: 50px; background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Noto Sans KR', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px; }
-        .reroll-btn:hover { border-color: #667eea; color: #667eea; transform: scale(1.05); }
-        .reroll-btn:active { transform: scale(0.95); }
-        .bg-glow { position: fixed; width: 300px; height: 300px; border-radius: 50%; filter: blur(120px); opacity: 0.08; pointer-events: none; z-index: 0; }
-        .glow-1 { top: -100px; right: -100px; background: #667eea; }
-        .glow-2 { bottom: -100px; left: -100px; background: #764ba2; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes shake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-15deg) scale(1.1)} 40%{transform:rotate(15deg) scale(1.1)} 60%{transform:rotate(-10deg) scale(1.05)} 80%{transform:rotate(10deg) scale(1.05)} }
         @keyframes pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.5); opacity: 0; } }
-        @media (min-width:768px) and (orientation:landscape) { body{overflow-y:auto} .tagline{font-size:42px;margin-bottom:40px} .logo-btn{width:180px;height:180px} .pulse-ring{width:200px;height:200px} #result-screen{padding:20px} .cards-row{flex-wrap:nowrap;gap:36px} .start-hint{font-size:16px;margin-top:30px} .card-title{font-size:30px} .card-label{font-size:16px} }
-        @media (max-width:600px) { .tagline{font-size:28px;margin-bottom:35px} .logo-btn{width:120px;height:120px} .pulse-ring{width:140px;height:140px} .card-title{font-size:22px} .result-card{padding:30px 24px} .cards-row{flex-direction:column;align-items:center;gap:20px} .reroll-btn{padding:18px 44px;font-size:16px} }
+        @keyframes shake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-15deg) scale(1.1)} 40%{transform:rotate(15deg) scale(1.1)} 60%{transform:rotate(-10deg) scale(1.05)} 80%{transform:rotate(10deg) scale(1.05)} }
+
+        .tap-text {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            z-index: 10;
+            padding: 20px;
+        }
+
+        .result-screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .result-cards {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 40px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px 32px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 280px;
+            max-width: 440px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        .card.show { animation: slideUp 0.6s ease forwards; }
+        .card:nth-child(2).show { animation-delay: 0.15s; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.1);
+        }
+
+        .card-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #667eea;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .card-emoji {
+            font-size: 2.5rem;
+            margin-right: 12px;
+            display: inline-block;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        .bottom-prompt {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-bottom: 30px;
+            animation: breathe 3s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .reroll-button {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            color: #ffffff;
+            padding: 12px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .reroll-button:hover {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.8);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .tagline {
+                font-size: 1.8rem;
+                margin-bottom: 50px;
+            }
+            .result-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+            .card-title {
+                font-size: 1.5rem;
+            }
+
+            .logo-button {
+                width: 120px;
+                height: 120px;
+            }
+
+            .pulse-ring {
+                width: 140px;
+                height: 140px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="bg-glow glow-1"></div><div class="bg-glow glow-2"></div>
-    <div id="start-screen">
-        <div class="tagline">Find your rest<br>Feel your rest</div>
-        <div class="logo-btn-wrap">
-            <div class="pulse-ring"></div>
-            <div class="pulse-ring"></div>
-            <div class="pulse-ring"></div>
-            <button class="logo-btn" id="diceBtn" onclick="roll()"><img src="/icons/icon-512.png" alt="OFFREST"></button>
-        </div>
-        <div class="start-hint">TAP TO OFFREST</div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
     </div>
-    <div id="result-screen">
-        <div class="cards-row">
-            <div class="result-card" id="restCard"><div class="card-emoji" id="restEmoji"></div><div class="card-label">오늘의 휴식</div><div class="card-title" id="restTitle"></div><div class="card-desc" id="restDesc"></div></div>
-            <div class="result-card delay" id="musicCard"><div class="card-emoji">🎵</div><div class="card-label">추천 음악</div><div class="card-title" id="musicTitle"></div><div class="music-artist" id="musicArtist"></div></div>
+
+    <div class="container">
+        <!-- Start Screen -->
+        <div class="start-screen" id="startScreen">
+            <div class="tagline">Find your rest<br>Feel your rest</div>
+            <div class="logo-btn-wrap">
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring"></div>
+                <button class="logo-button" id="logoButton"><img src="/icons/icon-512.png" alt="OFFREST" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></button>
+            </div>
+            <div class="tap-text">TAP TO OFFREST</div>
         </div>
-        <div class="bottom-area">
-            <div class="add-prompt">나만의 휴식을 카드에 적어주시면, 이곳에 등록됩니다</div>
-            <button class="reroll-btn" onclick="reroll()">🎲 한번 더 돌리기</button>
+
+        <!-- Result Screen -->
+        <div class="result-screen" id="resultScreen">
+            <div class="result-cards">
+                <!-- Rest Activity Card -->
+                <div class="card">
+                    <div class="card-label">ì¤ëì í´ì</div>
+                    <div class="card-title">
+                        <span class="card-emoji" id="restEmoji">â</span><span id="restTitle">í¸ëëë¦½ í ìì ì¬ì </span>
+                    </div>
+                    <div class="card-description" id="restDesc">ìë í¥ì ë§¡ì¼ë©° ì²ì²í ë´ë ¤ë³´ì¸ì.</div>
+                </div>
+
+                <!-- Music Card -->
+                <div class="card">
+                    <div class="card-label">ì¶ì² ìì</div>
+                    <div class="card-title">
+                        <span class="card-emoji">ðµ</span><span id="musicTitle">Song Title</span>
+                    </div>
+                    <div class="card-description" id="musicArtist">Artist Name</div>
+                </div>
+            </div>
+
+            <div class="bottom-prompt">ëë§ì í´ìì ì¹´ëì ì ì´ì£¼ìë©´, ì´ê³³ì ë±ë¡ë©ëë¤</div>
+            <button class="reroll-button" id="rerollButton">ð² íë² ë ëë¦¬ê¸°</button>
         </div>
     </div>
+
     <script>
-const R=[
-{e:"🧘",t:"5분 명상하기",d:"눈을 감고 호흡에 집중하며 마음을 비워보세요."},
-{e:"🚶",t:"산책 나가기",d:"가까운 공원이나 골목길을 천천히 걸어보세요."},
-{e:"☕",t:"따뜻한 차 한 잔",d:"좋아하는 차를 우려내며 여유를 즐겨보세요."},
-{e:"📖",t:"책 한 페이지 읽기",d:"부담 없는 책을 펴고 한 페이지만 읽어보세요."},
-{e:"🎨",t:"낙서 그리기",d:"종이 위에 자유롭게 그림을 그려보세요."},
-{e:"🌿",t:"식물 돌보기",d:"화분에 물을 주고 잎을 닦아주세요."},
-{e:"🛁",t:"따뜻한 샤워하기",d:"따뜻한 물로 하루의 피로를 씻어내 보세요."},
-{e:"🌅",t:"하늘 바라보기",d:"창문 밖 하늘을 5분만 바라보세요."},
-{e:"😴",t:"10분 낮잠 자기",d:"알람을 맞추고 편하게 눈을 감아보세요."},
-{e:"🎧",t:"좋아하는 노래 따라 부르기",d:"이어폰 끼고 좋아하는 노래를 따라 불러보세요."},
-{e:"✍️",t:"감사한 것 3가지 적기",d:"작은 것이라도 적어보면 마음이 따뜻해져요."},
-{e:"📺",t:"좋아하는 영상 보기",d:"짧은 힐링 영상을 보며 잠시 웃어보세요."},
-{e:"💆",t:"셀프 마사지하기",d:"관자놀이와 목, 어깨를 천천히 눌러주세요."},
-{e:"🌙",t:"조용한 음악 듣기",d:"아무 생각 없이 음악에 귀를 기울여보세요."},
-{e:"🔮",t:"비눗방울 불기",d:"동심으로 돌아가 비눗방울을 불어보세요."},
-{e:"🕯️",t:"캔들 켜고 멍때리기",d:"불꽃을 바라보며 아무 생각도 하지 마세요."},
-{e:"📸",t:"창밖 사진 찍기",d:"지금 보이는 풍경을 한 장 담아보세요."},
-{e:"🍰",t:"간식 만들어 먹기",d:"간단한 간식을 직접 만들어 즐겨보세요."},
-{e:"✉️",t:"친구에게 안부 보내기",d:"오랜만에 연락 못한 친구에게 한마디 건네보세요."},
-{e:"🎲",t:"퍼즐 맞추기",d:"간단한 퍼즐로 머리를 환기시켜 보세요."},
-{e:"🎹",t:"악기 연주해보기",d:"서툴러도 괜찮아요. 소리를 내보는 것만으로 충분해요."},
-{e:"🧣",t:"뜨개질하기",d:"반복적인 손동작이 마음을 차분하게 해줘요."},
-{e:"📝",t:"일기 쓰기",d:"오늘 하루를 짧게라도 기록해보세요."},
-{e:"🌸",t:"꽃 구경하기",d:"가까운 곳에서 피어난 꽃을 찾아보세요."},
-{e:"🍃",t:"허브차 마시기",d:"캐모마일이나 페퍼민트 한 잔 어떨까요."},
-{e:"🎐",t:"바람 소리 듣기",d:"창문을 열고 바깥 소리에 귀를 기울여보세요."},
-{e:"🖍️",t:"컬러링북 색칠하기",d:"색을 칠하며 잡생각을 내려놓아 보세요."},
-{e:"🤸",t:"가벼운 스트레칭",d:"굳은 몸을 천천히 풀어주세요."},
-{e:"💧",t:"찬물로 세수하기",d:"시원한 물로 얼굴을 씻으면 기분이 맑아져요."},
-{e:"🍳",t:"좋아하는 요리 하기",d:"만들고 싶었던 음식에 도전해보세요."},
-{e:"🎯",t:"종이비행기 접어 날리기",d:"접어서 날려보는 것만으로도 기분 전환이 돼요."},
-{e:"🌊",t:"파도 소리 틀어놓기",d:"자연의 소리가 마음을 편안하게 해줘요."},
-{e:"🌱",t:"화분 분갈이 하기",d:"식물에게 새 집을 마련해주세요."},
-{e:"📮",t:"엽서 쓰기",d:"누군가에게 짧은 손편지를 써보세요."},
-{e:"💐",t:"좋아하는 향수 뿌리기",d:"좋아하는 향기로 기분을 전환해보세요."},
-{e:"🎭",t:"재밌는 영화 한 편",d:"가볍고 유쾌한 영화로 기분 전환해보세요."},
-{e:"🍹",t:"과일 주스 만들기",d:"신선한 과일로 즉석 주스를 만들어보세요."},
-{e:"🐾",t:"반려동물 쓰다듬기",d:"옆에 있는 반려동물을 꼭 안아주세요."},
-{e:"🔍",t:"새로운 취미 검색하기",d:"해보고 싶던 취미를 검색해보세요."},
-{e:"🧠",t:"마인드맵 그리기",d:"머릿속 생각을 종이 위에 펼쳐보세요."},
-{e:"🏖️",t:"여행지 사진 구경하기",d:"가고 싶은 곳의 사진을 보며 상상해보세요."},
-{e:"💨",t:"깊은 호흡 10번",d:"4초 들이쉬고 7초 내쉬기를 반복해보세요."},
-{e:"🌻",t:"창가에 앉아있기",d:"햇빛을 받으며 잠시 가만히 앉아보세요."},
-{e:"🎶",t:"콧노래 흥얼거리기",d:"떠오르는 멜로디를 가볍게 흥얼거려보세요."},
-{e:"🗂️",t:"책상 정리하기",d:"깔끔한 공간이 마음도 정리해줘요."},
-{e:"🍵",t:"말차 라떼 만들기",d:"따뜻한 말차 한 잔으로 여유를 느껴보세요."},
-{e:"🌈",t:"좋았던 기억 떠올리기",d:"행복했던 순간을 떠올리며 미소 지어보세요."},
-{e:"📻",t:"라디오 듣기",d:"랜덤 라디오 채널을 틀어보세요."},
-{e:"🧘",t:"요가 한 동작",d:"간단한 요가 자세 하나만 따라 해보세요."},
-{e:"🎒",t:"내일 가방 미리 싸기",d:"내일을 준비하면 마음이 한결 가벼워져요."}
-];
-const M=[
-{t:"Weightless",a:"Marconi Union"},
-{t:"Clair de Lune",a:"Debussy"},
-{t:"Sunset Lover",a:"Petit Biscuit"},
-{t:"River Flows in You",a:"Yiruma"},
-{t:"Experience",a:"Ludovico Einaudi"},
-{t:"Bloom",a:"The Paper Kites"},
-{t:"Gymnopédie No.1",a:"Erik Satie"},
-{t:"Kiss the Rain",a:"Yiruma"},
-{t:"Nuvole Bianche",a:"Ludovico Einaudi"},
-{t:"Blue",a:"Keshi"},
-{t:"Snowfall",a:"Øneheart"},
-{t:"Dandelions",a:"Ruth B."},
-{t:"봄날",a:"BTS"},
-{t:"Through the Night",a:"IU"},
-{t:"Strawberry Moon",a:"IU"},
-{t:"Fly Me to the Moon",a:"Frank Sinatra"},
-{t:"Falling Slowly",a:"Glen Hansard"},
-{t:"First Love",a:"Nikka Costa"},
-{t:"Lemon Tree",a:"Fool's Garden"},
-{t:"Can't Help Falling in Love",a:"Elvis Presley"},
-{t:"La Vie en Rose",a:"Edith Piaf"},
-{t:"Moon River",a:"Audrey Hepburn"},
-{t:"Here Comes the Sun",a:"The Beatles"},
-{t:"Banana Pancakes",a:"Jack Johnson"},
-{t:"Better Together",a:"Jack Johnson"},
-{t:"Put Your Records On",a:"Corinne Bailey Rae"},
-{t:"Feeling Good",a:"Nina Simone"},
-{t:"What a Wonderful World",a:"Louis Armstrong"},
-{t:"Somewhere Over the Rainbow",a:"Israel Kamakawiwo'ole"},
-{t:"A Thousand Years",a:"Christina Perri"},
-{t:"All of Me",a:"John Legend"},
-{t:"Photograph",a:"Ed Sheeran"},
-{t:"Perfect",a:"Ed Sheeran"},
-{t:"Night Changes",a:"One Direction"},
-{t:"Golden Hour",a:"JVKE"},
-{t:"Heather",a:"Conan Gray"},
-{t:"Stay",a:"The Kid LAROI, Justin Bieber"},
-{t:"좋은 날",a:"IU"},
-{t:"에잇",a:"IU, SUGA"},
-{t:"밤편지",a:"IU"},
-{t:"Palette",a:"IU"},
-{t:"사랑하지 않아",a:"Urban Zakapa"},
-{t:"소우주",a:"BTS"},
-{t:"Love Poem",a:"IU"},
-{t:"나의 사춘기에게",a:"볼빨간사춘기"},
-{t:"여행",a:"볼빨간사춘기"},
-{t:"좋니",a:"윤종신"},
-{t:"너의 의미",a:"IU, 김창완"},
-{t:"Way Back Home",a:"숀 (SHAUN)"},
-{t:"Star",a:"Heize"}
-];
-let lr=-1,lm=-1,iT=null;
-function rT(){if(iT)clearTimeout(iT);iT=setTimeout(()=>{const s=document.getElementById('start-screen'),r=document.getElementById('result-screen');if(r.style.display==='flex'){r.style.display='none';s.style.display='flex';s.style.animation='none';void s.offsetWidth;s.style.animation='fadeIn 1s ease'}},30000)}
-['click','touchstart','keydown','mousemove','scroll'].forEach(e=>document.addEventListener(e,rT,{passive:true}));
-function gi(a,l){let i;do{i=Math.floor(Math.random()*a.length)}while(i===l&&a.length>1);return i}
-function roll(){const b=document.getElementById('diceBtn');b.classList.add('rolling');setTimeout(()=>{b.classList.remove('rolling');show()},500)}
-function show(){const s=document.getElementById('start-screen'),r=document.getElementById('result-screen');const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;const re=R[i],mu=M[j];document.getElementById('restEmoji').textContent=re.e;document.getElementById('restTitle').textContent=re.t;document.getElementById('restDesc').textContent=re.d;document.getElementById('musicTitle').textContent=mu.t;document.getElementById('musicArtist').textContent=mu.a;s.style.display='none';r.style.display='flex';rT();r.querySelectorAll('.result-card').forEach(c=>{c.classList.remove('show');void c.offsetWidth;c.classList.add('show')});const ba=r.querySelector('.bottom-area');ba.style.animation='none';void ba.offsetWidth;ba.style.animation='fadeIn 0.5s ease 0.6s forwards';ba.style.opacity='0'}
-function reroll(){const r=document.getElementById('result-screen');const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;const re=R[i],mu=M[j];rT();const cards=r.querySelectorAll('.result-card');cards.forEach(c=>c.classList.remove('show'));setTimeout(()=>{document.getElementById('restEmoji').textContent=re.e;document.getElementById('restTitle').textContent=re.t;document.getElementById('restDesc').textContent=re.d;document.getElementById('musicTitle').textContent=mu.t;document.getElementById('musicArtist').textContent=mu.a;cards.forEach(c=>{void c.offsetWidth;c.classList.add('show')})},300)}
+        // Rest Activities (50 items)
+        const R = [
+            {e:"â",t:"í¸ëëë¦½ í ìì ì¬ì ",d:"ìë í¥ì ë§¡ì¼ë©° ì²ì²í ë´ë ¤ë³´ì¸ì."},
+            {e:"ð",t:"ì°½ê°ìì ë©ëë¦¬ê¸°",d:"ìë¬´ ìê° ìì´ ë°ê¹¥ì ë°ë¼ë³´ì¸ì."},
+            {e:"ð",t:"ì± í ë¬¸ì¥ë§ ì½ê¸°",d:"ì¢ìíë êµ¬ì  íëë§ ì²ì²í ì½ì´ë³´ì¸ì."},
+            {e:"ð¹",t:"ì¬ì¦ì ëª¸ ë§¡ê¸°ê¸°",d:"ëì ê°ê³  ì¬ì¦ ì ì¨ì ë¹ ì ¸ë³´ì¸ì."},
+            {e:"âï¸",t:"ì¤ëì ê°ì  í ì¤ ì ê¸°",d:"ì§ê¸ ëë¼ë ê°ì ì í ì¤ë¡ ì ì´ë³´ì¸ì."},
+            {e:"ð¯ï¸",t:"í¥ê¸°ë¡ì´ ê³µê°ì ë¨¸ë¬¼ê¸°",d:"ì¢ìíë í¥ì´ ìë ê³³ìì ì¬ì´ë³´ì¸ì."},
+            {e:"ð¿",t:"ìë¬¼ ìì¬ê· ë§ì ¸ë³´ê¸°",d:"ì´ë¡ ìì ì§ê°ì ìëì¼ë¡ ëê»´ë³´ì¸ì."},
+            {e:"ð­",t:"5ë¶ê° ê³µìíê¸°",d:"ì´ëë¡ ê° ë ëë ììì í´ë³´ì¸ì."},
+            {e:"ð¨",t:"ìë¯¸ ìë ì  ê·¸ë¦¬ê¸°",d:"íì ë¤ê³  ìì ë¡­ê² ì ì ê·¸ì´ë³´ì¸ì."},
+            {e:"ð",t:"ê¹ì ì¨ ì¸ ë²",d:"ì²ì²í ë¤ì´ì¬ê³  ê¸¸ê² ë´ì¬ì´ë³´ì¸ì."},
+            {e:"ð",t:"ë¸ìë¹ ê°ìíê¸°",d:"íëì ìì´ ë³íë ìê°ì ë´ìë³´ì¸ì."},
+            {e:"ð¸",t:"ì¼ìì í ì»· ì°ê¸°",d:"ì§ê¸ ì´ ìê°ì ì¬ì§ í ì¥ì¼ë¡ ë¨ê²¨ë³´ì¸ì."},
+            {e:"ð§",t:"ì¢ìíë ê³¡ í ê³¡ë§",d:"ì´ì´í°ì ë¼ê³  ë± í ê³¡ë§ ì§ì¤í´ë³´ì¸ì."},
+            {e:"ð¸",t:"ê½í¥ê¸° ë§¡ìë³´ê¸°",d:"ê°ê¹ì´ ê³³ì ê½ í ì¡ì´ì ì½ë¥¼ ëë³´ì¸ì."},
+            {e:"ð",t:"ê³ ë§ì´ ì¬ë ì´ë¦ ì ê¸°",d:"ë ì¤ë¥´ë ê³ ë§ì´ ì¬ëì ì ì´ë³´ì¸ì."},
+            {e:"ð",t:"ë°ëì ì¨ë ëë¼ê¸°",d:"ì°½ë¬¸ì ì´ê³  ë°ëì ì¨ëë¥¼ ëê»´ë³´ì¸ì."},
+            {e:"ð",t:"íë ìë¦¬ì ì ê¸°ê¸°",d:"ìì°ì ìë¦¬ë¡ ë§ìì ê°ë¼ìíë³´ì¸ì."},
+            {e:"ð",t:"ê´ìëì´ ì§ê·¸ì ëë¥´ê¸°",d:"ììª½ ê´ìëì´ë¥¼ ì²ì²í ëë¬ì£¼ì¸ì."},
+            {e:"ð¹",t:"í¼ìë¸ ì ì¨ ë°ë¼ê°ê¸°",d:"í¼ìë¸ ì íëíëë¥¼ ê·ë¡ ì«ìë³´ì¸ì."},
+            {e:"ð",t:"ë¬ë¹ ìë ìë³´ê¸°",d:"ë°¤íëì ë¬ì ì¬ë ¤ë¤ë³´ì¸ì."},
+            {e:"ðµ",t:"ë°ë»í ê² ìì¼ë¡ ê°ì¸ê¸°",d:"ë°ë»í ìì ë ìì¼ë¡ ê°ì¸ë³´ì¸ì."},
+            {e:"âï¸",t:"ëìê² í¸ì§ ì°ê¸°",d:"ë¯¸ëì ëìê² ì§§ì í¸ì§ë¥¼ ì¨ë³´ì¸ì."},
+            {e:"ð®",t:"ì¤ëì ìê¹ ì íê¸°",d:"ì¤ë ëì ê¸°ë¶ì ìì¼ë¡ ííí´ë³´ì¸ì."},
+            {e:"ð",t:"ì¢ìë ìê° ë¦¬íë ì´",d:"ìµê·¼ íë³µíë ì¥ë©´ì ë ì¬ë ¤ë³´ì¸ì."},
+            {e:"ð»",t:"ëª¨ë¥´ë ë¼ëì¤ ì±ë ë£ê¸°",d:"ì²ì ë£ë ë¼ëì¤ ì±ëì íì´ë³´ì¸ì."},
+            {e:"ð­",t:"íì  ìì´ 1ë¶ ë²í°ê¸°",d:"ë¬´íì ì¼ë¡ 1ë¶, ê·¸ë¦¬ê³  ë¯¸ì ì§ì´ë³´ì¸ì."},
+            {e:"ð»",t:"íì´ í ì¤ ë°ê¸°",d:"íë¹ì´ ë¿ë ê³³ì ì ì ë¨¸ë¬¼ë¬ë³´ì¸ì."},
+            {e:"ð°",t:"ë¬ì½¤í í ìì ìë¡",d:"ì¢ìíë ëì í¸ í ìì ìë¯¸í´ë³´ì¸ì."},
+            {e:"ð®",t:"ì½ìì ë§ì ë´ê¸°",d:"ì§§ì ì½ìì ì§ì¬ì í ì¤ ì ì´ë³´ì¸ì."},
+            {e:"ð¶",t:"íë°ì¼ë¡ íë¬ê°ê¸°",d:"ë ì¤ë¥´ë ë©ë¡ëë¥¼ ê°ë³ê² í¥ì¼ê±°ë ¤ë³´ì¸ì."},
+            {e:"ðï¸",t:"ê°ì¥ í¸í ìì¸ ì°¾ê¸°",d:"ì¨ëª¸ì íì ë¹¼ê³  í¸í ìì¸ë¥¼ ì°¾ìë³´ì¸ì."},
+            {e:"ð",t:"ìë¬´ ì´ì  ìì´ ìê¸°",d:"ê·¸ë¥ íë² ìì´ë³´ì¸ì. ì´ì ë ëì¤ì."},
+            {e:"ð±",t:"ìë¼ëë ê² ê´ì°°íê¸°",d:"ìë¬¼ì´ ìë¼ë ëª¨ìµì ê°ë§í ì§ì¼ë³´ì¸ì."},
+            {e:"ð",t:"ì í í¸ ì½ê¸°",d:"ì§§ì ì í í¸ì¼ë¡ ë§ìì ì±ìë³´ì¸ì."},
+            {e:"ð",t:"ë°ëì íë¤ë¦¬ë ê² ë³´ê¸°",d:"ë°ëì íë¤ë¦¬ë ë¬´ì¸ê°ë¥¼ ë°ë¼ë³´ì¸ì."},
+            {e:"ð³",t:"ìëë¥´ì§ ìê³  í ì ìë¥¼ ìì±í´ë³´ì¸ì."},
+            {e:"ð",t:"ë³ìë¦¬ ì°¾ìë³´ê¸°",d:"ë°¤íëìì ìë ë³ìë¦¬ë¥¼ ì°¾ìë³´ì¸ì."},
+            {e:"ð§",t:"ë¬¼ í ì ì²ì²í ë§ìê¸°",d:"ë¬¼ í ëª¨ê¸ì ììí¨ì ëê»´ë³´ì¸ì."},
+            {e:"ð",t:"ë´ì¼ì ëë¥¼ ìí ì¤ë¹",d:"ë´ì¼ ìì ì·ì ë¯¸ë¦¬ êº¼ë´ë³´ì¸ì."},
+            {e:"ð¾",t:"ëë¬¼ ìì 3ë¶ ë³´ê¸°",d:"ê·ì¬ì´ ëë¬¼ ììì¼ë¡ ì ì ë¹ìë³´ì¸ì."},
+            {e:"ðï¸",t:"ìì°íë¡ ìë¬´ê±°ë ì¹ íê¸°",d:"ì¢ì´ ìì ì¢ìíë ìì ë§êµ¬ ì¹ í´ë³´ì¸ì."},
+            {e:"ð",t:"ì´ë  ìì ë ê°ê¸°",d:"ë¶ì ëê³  ì´ë  ììì ëì ê°ìë³´ì¸ì."},
+            {e:"ð§",t:"ASMRë¡ ê°ê° ê¹¨ì°ê¸°",d:"ë¹ìë¦¬ë ëª¨ë¥ë¶ ìë¦¬ì ê·ë¥¼ ë§¡ê²¨ë³´ì¸ì."},
+            {e:"ð§ ",t:"ìë¬´ ë¨ì´ë ì°ìíê¸°",d:"ë ì¤ë¥´ë ë¨ì´ë¥¼ ë°ë¼ ìê°ì íë ¤ë³´ì¸ì."},
+            {e:"ð¿",t:"íë¸ í¥ ë§¡ìë³´ê¸°",d:"ë¡ì¦ë§ë¦¬ë ë¼ë²¤ë í¥ì ë¤ì´ë§ìë³´ì¸ì."},
+            {e:"ð¯",t:"ì¢ì´ì ê¸° í ë²",d:"ì¢ì´ë¥¼ ì ì´ ìì ìíì ë§ë¤ì´ë³´ì¸ì."},
+            {e:"ð",t:"èl:ê¡H:à«»-¥:¬è;"k:®,»'`;'`;eg;(l:ê¡zéã:àª:®,:¬è:â";'a;"k:¬£;em;(ï;!.;&¥KÙN¸§*»&):â¦;'f;'¤{'`;!,{-ê;!.:®,»&):â¦;em:à®;'¤{'`;'o:äé;'a:å¨;&+:è):ìí;!.;&¥KÙN¼'ã­H».m;c¦Ó{%ä:­à:®,;&®;'m:®,»(ï:ìà;'f;'c;%a{%ä;&*;(!;g¢:­à:éo:®,;&®;%ë:ìí;!.;&¥KÙN¼'ã&Hºà­;'o;'`:ãe;(¢û'a:¬l;%oºâ";'a:¬$:¬è:à­;'o;'a:®,:ã ;em:ìí;!.;&¥BNÂËÈ]\ÚXÈ
+Ì][\ÊBÛÛÝHHÂÝÛÈÚ]NZ[\È]\ÈKÝÛZ\H[HNÛ]YHX\ÜÞHKÝ]][[X]\ÈN[][ÈKÝZÙH]HN]HXXÚÈKÝ[HÙ[[Y[[[ÛÙNÚÛÛ[HKÝÙ[ÜÚXHÛ^HZ[NÜZÛ\ÈKÝÜ[È\È\HNÚ]ZÙ\KÝÝ[ZYYÚN[Û[Ý\È[ÛÈKÝXYÙ\ÈN[ÛÈZ[\KÝ[H[ÜÈ[ÝH\HNÜØØ\]\ÛÛKÝÚ\ÛH\[[XHNÝ[Ù]KÝÝ[[Y\[YHN[YHÛY^HKÝÙH[ÛÝ[NÛÛ[X[]ÚÚ[ÈKÝØ\][NZÙH[[ÝÛKÝYÚ[^HN[ÈÚ[]HKÝHØ^H[ÝHÛÚÈÛYÚN[H]Ù\[KÝHYHÈH[ÛÛN[ÈÚ[]HKÝ[ÜÙ]XHN]Ú[ÈÛÛHKÝZ\ÝHN\ÛØ\\KÝÚ[ÙXHYÙHN[HÝ^ZÜKÝ[YH[HZ[ÜN°êY0ê\XÈÚÜ[KÝØÝ\HËN°êY0ê\XÈÚÜ[KÝÞ[[Ü0êYYHËHN\ZÈØ]YHKÝÛÜÜÚY[HËHN\ZÈØ]YHKÝHØ]0êY[H[ÛÝ]YHNÛ]YHX\ÜÞHKÝ°ê\YHNÛ]YHX\ÜÞHKÝØÝ\HËH[Y]XZÜN°êY0ê\XÈÚÜ[KÝYX\Ý][HËÈN[\ÞKÝ[Ø\X[\ÛÙHËN[\ÞKÝ[Y[ÈZ[ÜNÚÜ[KÝ]\ÝÜÈ[[ÝHNZ\[XHKÝÚ\ÜÈHZ[NZ\[XHKÝ][\HNYÝXÛÈZ[]YHKÝ[HX][HNYÝXÛÈZ[]YHKÝ]ÛHX[ÚHNYÝXÛÈZ[]YHKÝZX[[HNYÝXÛÈZ[]YHKÝ\N]ZXÚHØZØ[[ÝÈKÝ^Z[ÈHX[ÈN]ZXÚHØZØ[[ÝÈKÝH\Ý[\\Ü[YHN]ZXÚHØZØ[[ÝÈKÝ\]XHÜ\ÈNÙH\ØZ\ÚHKÝÝ[[Y\NÙH\ØZ\ÚHKÝÝÈX]]Y[NÙ[ÜÙHÚ[ÝÛKÝXXÙHNÙ[ÜÙHÚ[ÝÛKÝXÙ[X\NÙ[ÜÙHÚ[ÝÛKÝÚÞHN[ÚHZÙYHKÝÝ[^H[Ü[ÈN°äÛY\\[ÈKÝNY[X\N°äÛY\\[ÈKÝØ[X[N°äÛY\\[ÈKÝHÚÜ[ÚXÝNX^XÚ\KÝ\\\HNX^XÚ\KÝÛY\NX^XÚ\KÝÛÛHNXÚÈKÝ]ØZÙHNXÚÈKÝ]HNXÚÈKÝ]\Y^HNÛØÈKÝÙ\[HNÛØÈKÝÚX\HNÛØÈKÝ[Ù[NY]\HÛÜÜ][ÛKÝYÙ[ÛNY]\HÛÜÜ][ÛKÝX[\ÙHÛHNY]\HÛÜÜ][ÛKÝÝYYËY[Û\NÚYÝ\°ìÜÈKÝÝ\°è[\NÚYÝ\°ìÜÈKÝÜ0ë\ÛHNÚYÝ\°ìÜÈKÝÛHNÚYÝ\°ìÜÈKÝÛYHNYØ\Ú\H	HXYÛ]XÈ\ÜÈKÝ^HN[X\ÜØYÜÈKÝÜ\Ý[^YNHKÝ\Û[ÈNHKÝ[ÈNHKÝÛÈÙYZÜÈNÜ[Y\ÈKÝ\ÙZ[ÈNÛ\È\Û^HKÝÛ[\Ý[ÈNÛØÈKÝÙ\[HNXÚÈKÝ\ØÚNXÚÈKÝ]ØZÙ[[ÈN°äÛY\\[ÈKÝÛ[ÜÝÈN°äÛY\\[ÈKÝ\Û[ÛÛÜÈN°äÛY\\[ÈKÝÜ\[NHÚ[[X]XÈÜÚ\ÝHKÝÈZ[HÛYHNHÚ[[X]XÈÜÚ\ÝHKÝ\[ÈNHÚ[[X]XÈÜÚ\ÝHKÝXYÙ\ÈN[ÛÈZ[\KÝZ[ÜY\ÈNÙ\È[ÛÛÛY\HKÝÝ\ÛÚ^NÙ\È[ÛÛÛY\HKÝ[\[	ÈÛÝ[Ù]NÙ\È[ÛÛÛY\HKÝXZY[ÞXYÙHN\YH[ÛØÚÈKÝØ]\Y[ÛX[N\YH[ÛØÚÈKÝØ[[Ý\H\Û[N\YH[ÛØÚÈKÝ\Ý[YH\Y\ÙHNÝ]YHÛÛ\KÝ\ÛÝÚHÝ[HNÝ]YHÛÛ\KÝÛÛ[YHNÝ]YHÛÛ\KÝÛÛX[NÚHØ]KÝYHYHYHNÜZÛ\ÈKÝÝ[\ÙHNÜZÛ\ÈKÝÛÝÛÝÈÚHNÜZÛ\ÈKÝY[[ÈHØ[YHØ^HNÜZÛ\ÈKÝÚ\Ú[È\]\ÈNÜZÛ\ÈKÝ\HÙH\HNÜZÛ\ÈKÝ]HÝXHÚ\NÜZÛ\ÈKÝÛÛÛÛÛÛNÜZÛ\ÈKÝHÛÈ^H\ÈÝ\NÜZÛ\ÈKÝHØ[ÝXZÙH[ÝHÝHYHNÛYHZ]KÝÛÛY][ÈÈ[ÈXÝ]NÛYHZ]KÝXÚÈÙ[YHNÛYHZ]KÝ[Ù[ÛH[ÛÛÛY\HNÚ[HKÝ]	ÜÈHØ^HHÛÜÛÙ\ÈÝ[NÚ[HKÝZ\ÙYÜ[ÙHNÚ[HKÝX]HX\ÞHNXÚÜÛÛÝÛHKÝØÝÜØÝÜNXÚÜÛÛÝÛHKÝH][\NXÚÜÛÛÝÛHKÝ[[H[ØZÙ\ÈNXÚÈÚÛÛKÝ]\ÙÙ]\NXÚÈÚÛÛKÝÛÛÙ\È]]\Ø\ÈNXÚÈÚÛÛKÝÚ][ËØZ][ËÚ\Ú[ÈNXÚÈÚÛÛKÝY\ÚNÝX[YHKÝÚ\Ú[È][Y[ÈNY[HKÝÛ[È[HY\NY[HKÝÛÛY[ÛHZÙH[ÝHNY[HKÝ[YYHNÙX[]\ÈZÙHKÝ^HY\ÛÛNÚ]ZÙ\KÝ^H[H[[[HNÚ]ZÙ\KÝXXÙHYXÙHN[][ÈKÝÙX[ÜXHN[][ÈKÝ]X]]Y[N[][ÈKÝÛÛ]YHNZÙH[[ÝÛKÝZÙHHHZ[NZÙH[[ÝÛKÝ[ÛÙ[YÛÈNZÙH[[ÝÛKÝH[X\È[ÝHXYHN[][ÈKÝ]ZY]ÝÈN[][ÈKÝÚ[ÙHÙHY]N[][ÈKÝÛÛYH]Ø^HÚ]YHNÜZÛ\ÈKÝH\HÈÝHYHNÝÛ\È[[KÝÝ[ÈYÈÜÙHNÝÛ\È[[KÝÈ]H\ÈÈHNÝÛ\È[[KÝHÝÜHN[HØ\[HKÝYÜH]XZÜÈN[HØ\[HKN\[[HN[HØ\[HKÝÛÜÙ\È[HN[YÛÈÚ\ÈKÝÛXYË[X[È[ÛÝØÞ\ÈN[YÛÈÚ\ÈKÝÜY[N[YÛÈÚ\ÈKÝXXÚ[Ý\Ú[[NÜÜØKÝ[È	\ÚKÝ[\ÜÛHÜ[ÈNÜÜØKÝ[È	\ÚKÝÝZ]NYHYH^Y\ÈNÜÜØKÝ[È	\ÚKÝXÛÝ\ÝXÈÌÈNÜðêHÛÛ°è[^KÝÜÜÜÙ\ÈNÜðêHÛÛ°è[^KÝ\]Ø^HNÜðêHÛÛ°è[^KÝX\X]ÈNÜðêHÛÛ°è[^KÝÞXÛ[È][\ÈNÜðêHÛÛ°è[^KÝ[Y\NÜðêHÛÛ°è[^KÝ[XHNHÝ\HKÝÞ\ÈÛÝÜHNHÝ\HKÝHÜ\ÝNHÝ\HKÝÜ\ÚÞHNXÚÈZÙHKÝ[È[ÛÛNXÚÈZÙHKÝ]\X[NXÚÈZÙHKÝ[YHÙÈ\HNXÚÈZÙHKÝ^^HNXÚÈZÙHKÝ\\Ú]HNXÚÈZÙHKÝÜÜÛÛHNXÚÈZÙHKÝÛHH[Ü[ÈNXÚÈZÙHKÝÚÚ[HÝHNÛ]\KÝÛØÙ[HNÛ]\KÝ[YHNÛ]\KÝÜ[[XHNÛ]\KÝÙ[NÛ]\KÝÜX]\HX\NÛ]\KÝ[ÚYYNÛ]\KÝHÛÛ\È
+XÝH[RJHNÛ]\KÝÝ[ZX\YY\ÈN\Û	Ú[HKÝZÙY\ÈÙHØ[YHN\Û	Ú[HKÝYÚ\ÜÈ\[Y\XØ[[Ý]N\Û	Ú[HKÝÝ[Ù]ÛÛÛÜÛÝ[N\Û	Ú[HKÝXXÚÛÛYHÙÙ]\N\Û	Ú[HKÝÛÛÛÛXÚ]HN\Û	Ú[HKÝÙZ[Y\ÈN\Û	Ú[HKÝ[Ý\[[Z[HN^ÜÚ[ÛÈ[HÚÞHKÝ[Ý\[[Z[HNÛÙÜYY[ÝHHXÚÈ[\\ÜKÝHÚÜÝÝÜHNY]Þ\ÈKÝÚ]HÚ[\[[[NY]Þ\ÈKÝ^ZÛÛÜÈNY]Þ\ÈKÝYXYÝÛ\ÜÈNY]Þ\ÈKÝ[Ý[Z[ÛÝ[NY]Þ\ÈKÝYÙ\[Ý[Z[X\Ø[ÛÛÈNY]Þ\ÈKÝ[\ÜÛ\ÜÈY\ÈNY]Þ\ÈKÝÛØÙ[HNY]Þ\ÈKÝÚXØYÛÈNÝY[Ý][ÈKÝÝ\Ù[HNÝY[Ý][ÈKÝÈH[ÛHÚ][ÝHNÝY[Ý][ÈKÝHÛH[ÈNÝY[Ý][ÈKÝX]Ú]YÛ]HNÝY[Ý][ÈKÝØ\YH	ÝÙ[NÝY[Ý][ÈKÝÚÝ[]HÛÝÛ]\NÝY[Ý][ÈKÝØ\Ú[Z\[\ÚÚH^HNÝY[Ý][ÈKÝ[0í[ÈØ\ÜÈØ[HNØ]HHH\ÝÙ[Û[ÈØ\ÜÈØ[HKÝHÚ\ÛH\[[XHNðèÛÈÚ[\ÈKÝØ\ÝHH\[[XHN[0í[ÈØ\ÜÈØ[HKÝÛÜÛÝYÈNðèÛÈÚ[\ÈKÝ°àYÝX\ÈHX\°éÛÈNÛHØ[HKÝÜÜØHÝHNÝ[Ù]KÝØ[XHY\È^\ÈNÝ[Ù]KÝÛHÝHØ[XHNÝ[Ù]KÝYY]][ÛNÝ[Ù]KÝ\ØY[YÈNðèÛÈÚ[\ÈKÝ]HÙZH]YHÝHH[X\NÛHØ[HKÝ\ÝHN[Û[ÈØ\ÜÈØ[HKÝXXØ]Y[ÈNZX\ÈKÝX]\NZX\ÈKÝYHÝÛNZX\ÈKÝ]ÚXÊHNZX\ÈKÝÛÝ[[ÈÝ\ÈNZX\ÈKÝÜ^ÛNZX\ÈKÝÝÙ\[HÛÛHNZX\ÈKÝYXÝ[Û]\[NZX\ÈKÝYXÝ[Û]\[NÚØ]Ø\HKÝÝÙ\[ÙHNÚØ]Ø\HKÝ]\ÛHÚ[ÛÙNÚØ]Ø\HKÝÝ[Ü^\ßNÚØ]Ø\HKÝÛÝYX[HNÚØ]Ø\HKÝXÚÈNÚØ]Ø\HKÝ\ÜÙYNÚØ]Ø\HKÝÚÞ[È]\YHNÚØ]Ø\HKÝÚ[YX]ÈÛHNÛ\XX]ÈKÝ\ÜNÛ\XX]ÈKÝY[[ÜH[HNÛ\XX]ÈKÝÝ[^H]HNÛ\XX]ÈKÝY\ÛÛNÛ\XX]ÈKÝÛY\H^Y\ÈNÛ\XX]ÈKÝY[[ÜÈNÛ\XX]ÈKÝ]ÈXYNÛ\XX]ÈKÝ[\ÈNYX[\ÛHKÝÚÞHNYX[\ÛHKÝ]NYX[\ÛHKÝÛYHNYX[\ÛHKÝÛÛY]Ú\HNYX[\ÛHKÝX[Z[ÈNYX[\ÛHKÝØ\[NYX[\ÛHKÝY[[ÜHNYX[\ÛHKÝÆFRævBG&fR"Æ¢$¦ç6ær'ÒÀ¢·C¢%&VfÆV7B"Æ¢$¦ç6ær'ÒÀ¢·C¢%7FÆÂ"Æ¢$¦ç6ær'ÒÀ¢·C¢$÷&¦öç2"Æ¢$¦ç6ær'ÒÀ¢·C¢$6ÆÒÖæB"Æ¢$¦ç6ær'ÒÀ¢·C¢$G&V×2"Æ¢$¦ç6ær'ÒÀ¢·C¢%v¶R"Æ¢$¦ç6ær'ÒÀ¢·C¢%vçFW""Æ¢$¦ç6ær'ÒÀ¢·C¢%7Væç6FR"Æ¢$·WÆ'ÒÀ¢·C¢%v"Æ¢$·WÆ'ÒÂÝÙ[HNÝ\HKÝÝÈNÝ\HKÝØ][ÈNÝ\HKÝY^HNÝ\HKÝYÚNÝ\HKÝXXÙHNÝ\HKÝÝ[[Y\YÚÈN]ZXÚÛH]ZXÚÛHKÝÛÛHN]ZXÚÛH]ZXÚÛHKÝX\ÙHN]ZXÚÛH]ZXÚÛHKÝ[\ÜÈN]ZXÚÛH]ZXÚÛHKÝYN]ZXÚÛH]ZXÚÛHKÝ\ÝN]ZXÚÛH]ZXÚÛHKÝÛÝÈN]ZXÚÛH]ZXÚÛHKÝØ[HN]ZXÚÛH]ZXÚÛHKÝÜÝNYHÙY\Ù^HKÝ\ÜØYÙHNYHÙY\Ù^HKÝ[ÛHNYHÙY\Ù^HKÝZ[NYHÙY\Ù^HKÝYÚNYHÙY\Ù^HKÝY[[ÜY\ÈNYHÙY\Ù^HKÝÝ[NYHÙY\Ù^HKÝÛY\NYHÙY\Ù^HKÝ]\ÚXÈÜZ\ÜÈNX[[ÈKÝ[XY[N]\ÚXÈÜZ\ÜÈNX[[ÈKÝ\ÛÎ][ÜÜ\\È[ÛÝ[XÚÜÈNX[[ÈKÝ\ØÜY]]\ÚXÈNX[[ÈKÝHÚ]Ý\ÜÙ[XHNX[[ÈKÝ]\ÚXÈÜ[ÛY[ÈNX[[ÈKÝYXÝ[ÛÈNX[[ÈKÝÜXÚY\ÈNX[[ÈKÝÜ[ØÛÈÝÈN[XHKÝX^H]HN[XHKÝÛH[YHN[XHKÝØ]\X\ÈN[XHKÝØ\XX[YHN[XHKÝZ[HÚÞHÚ]Ý\ÈN[XHKÝÝÜ\È[YXØHN[XHKÝØZ[[ÈN[XHKÝÚ[ÈØYNÚ]\ÈKÝX][[X\NÚ]\ÈKÝ[ÝHNÚ]\ÈKÝ\Ý[ÞXYÙHNÚ]\ÈKÝ\^[ÛHÛÝYÈNÚ]\ÈKÝXXÙY[[^HNÚ]\ÈKÝØXÜYÝ\^HNÚ]\ÈKÝ]ØZÙ[[ÈNÚ]\ÈKÝ]\ÝNX[HKÝØ[Ü[HNX[HKÝZ[[NØ[HKÝX\ZÙ\ÚNØ[HKÝÜÝ[ÚXHNØ[HKÝ[[H\Ý[ÛY[NØ[HKÝ[Ü[ÈÛÜHNX[HKÝYÚNØ[HKÝÛÛ]YHNÙ[ÜÙHÚ[ÝÛKÝ]][[X]\ÈNÙ[ÜÙHÚ[ÝÛKÝÚ[\[ÈÜ[ÈNÙ[ÜÙHÚ[ÝÛKÝH[ÛÛ[HÝHNÙ[ÜÙHÚ[ÝÛKÝÙ\Ý[X\[ØYNÙ[ÜÙHÚ[ÝÛKÝ\X][ÛÈÛHØ[ÛNÙ[ÜÙHÚ[ÝÛKÝÜ^[ÈNÙ[ÜÙHÚ[ÝÛKÝ[YH[ØÝ\HNÙ[ÜÙHÚ[ÝÛBNÂ]KLKOKLKU[[Â[Ý[ÛÚJK
+^Û]NÙÞÚOSX]ÛÜX][ÛJ
+JK[Ý
+_]Ú[JOOO[	K[ÝJNÜ]\_B[Ý[Û
+
+^ÚYU
+XÛX\[Y[Ý]
+U
+NÚU\Ù][Y[Ý]
+
+
+OOØÛÛÝÏYØÝ[Y[Ù][[Y[RY
+	ÜÝ\ØÜY[Ê\YØÝ[Y[Ù][[Y[RY
+	Ü\Ý[ØÜY[ÊNÚYÛ\ÜÓ\ÝÛÛZ[Ê	ØXÝ]IÊJ^ÜÛ\ÜÓ\Ý[[ÝJ	ØXÝ]IÊNÜËÛ\ÜÓ\Ý[[ÝJ	ÚY[Ê__KÌ
+_BÉØÛXÚÉË	ÝÝXÚÝ\	Ë	ÚÙ^YÝÛË	Û[Ý\Ù[[ÝIË	ÜØÜÛ	×KÜXXÚ
+OOØÝ[Y[Y][\Ý[\KÜ\ÜÚ]NY_JJNÂ[Ý[ÛÛ
+
+^ØÛÛÝYØÝ[Y[Ù][[Y[RY
+	ÛÙÛÐ]ÛÊNØÛ\ÜÓ\ÝY
+	ÜÛ[ÉÊNÜÙ][Y[Ý]
+
+
+OOØÛ\ÜÓ\Ý[[ÝJ	ÜÛ[ÉÊNÜÚÝÊ
+_K
+L
+_B[Ý[ÛÚÝÊ
+^ÂÛÛÝÏYØÝ[Y[Ù][[Y[RY
+	ÜÝ\ØÜY[ÊKYØÝ[Y[Ù][[Y[RY
+	Ü\Ý[ØÜY[ÊNÂÛÛÝOYÚJKYÚJKJNÛZNÛOZÂÛÛÝOTÚWK]OSVÚNÂØÝ[Y[Ù][[Y[RY
+	Ü\Ý[[ÚIÊK^ÛÛ[\KNÂØÝ[Y[Ù][[Y[RY
+	Ü\Ý]IÊK^ÛÛ[\KÂØÝ[Y[Ù][[Y[RY
+	Ü\Ý\ØÉÊK^ÛÛ[\KÂØÝ[Y[Ù][[Y[RY
+	Û]\ÚXÕ]IÊK^ÛÛ[[]KÂØÝ[Y[Ù][[Y[RY
+	Û]\ÚXÐ\\Ý	ÊK^ÛÛ[[]KNÂËÛ\ÜÓ\ÝY
+	ÚY[ÊNÜÛ\ÜÓ\ÝY
+	ØXÝ]IÊNÜ
+
+NÂ]Y\TÙ[XÝÜ[
+	ËØ\	ÊKÜXXÚ
+ÏOØËÛ\ÜÓ\Ý[[ÝJ	ÜÚÝÉÊNÝÚYËÙÙ]ÚYØËÛ\ÜÓ\ÝY
+	ÜÚÝÉÊ_JNÂB[Ý[Û\Û
+
+^ÂÛÛÝYØÝ[Y[Ù][[Y[RY
+	Ü\Ý[ØÜY[ÊNÂÛÛÝOYÚJKYÚJKJNÛZNÛOZÂÛÛÝOTÚWK]OSVÚNÜ
+
+NÂÛÛÝØ\Ï\]Y\TÙ[XÝÜ[
+	ËØ\	ÊNÂØ\ËÜXXÚ
+ÏOËÛ\ÜÓ\Ý[[ÝJ	ÜÚÝÉÊJNÂÙ][Y[Ý]
+
+
+OOÂØÝ[Y[Ù][[Y[RY
+	Ü\Ý[[ÚIÊK^ÛÛ[\KNÂØÝ[Y[Ù][[Y[RY
+	Ü\Ý]IÊK^ÛÛ[\KÂØÝ[Y[Ù][[Y[RY
+	Ü\Ý\ØÉÊK^ÛÛ[\KÂØÝ[Y[Ù][[Y[RY
+	Û]\ÚXÕ]IÊK^ÛÛ[[]KÂØÝ[Y[Ù][[Y[RY
+	Û]\ÚXÐ\\Ý	ÊK^ÛÛ[[]KNÂØ\ËÜXXÚ
+ÏOÝÚYËÙÙ]ÚYØËÛ\ÜÓ\ÝY
+	ÜÚÝÉÊ_JNÂKÌ
+NÂBØÝ[Y[Ù][[Y[RY
+	ÛÙÛÐ]ÛÊKY][\Ý[\	ØÛXÚÉËÛ
+NÂØÝ[Y[Ù][[Y[RY
+	Ü\Û]ÛÊKY][\Ý[\	ØÛXÚÉË\Û
+NÂÜØÜ\ØÙOÚ[ck', reroll);
     </script>
 </body>
 </html>
