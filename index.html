@@ -31,7 +31,7 @@
         .card-emoji { font-size: 52px; margin-bottom: 18px; }
         .card-label { font-size: 15px; color: #667eea; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; font-weight: 700; }
         .card-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; line-height: 1.4; }
-        .card-desc { font-size: 15px; color: #999; line-height: 1.7; max-width: 320px; margin: 0 auto; word-break: keep-all; overflow-wrap: break-word; }
+        .card-desc { font-size: 15px; color: #999; line-height: 1.7; margin: 0 auto; word-break: keep-all; overflow-wrap: break-word; }
         .music-artist { font-size: 15px; color: #999; margin-top: 6px; }
         .bottom-area { margin-top: 40px; opacity: 0; animation: fadeIn 0.5s ease 0.6s forwards; display: flex; flex-direction: column; align-items: center; gap: 24px; }
         .add-prompt { font-size: 14px; color: #777; letter-spacing: 0.3px; line-height: 1.6; padding: 16px 30px; border: 1px dashed rgba(255,255,255,0.12); border-radius: 16px; background: rgba(255,255,255,0.02); }
@@ -46,7 +46,7 @@
         @keyframes shake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-15deg) scale(1.1)} 40%{transform:rotate(15deg) scale(1.1)} 60%{transform:rotate(-10deg) scale(1.05)} 80%{transform:rotate(10deg) scale(1.05)} }
         @keyframes pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.5); opacity: 0; } }
         @media (min-width:768px) and (orientation:landscape) { body{overflow-y:auto} .tagline{font-size:42px;margin-bottom:40px} .logo-btn{width:180px;height:180px} .pulse-ring{width:200px;height:200px} #result-screen{padding:20px} .cards-row{flex-wrap:nowrap;gap:36px} .start-hint{font-size:16px;margin-top:30px} .card-title{font-size:30px} .card-label{font-size:16px} }
-        @media (max-width:600px) { .tagline{font-size:28px;margin-bottom:35px} .logo-btn{width:120px;height:120px} .pulse-ring{width:140px;height:140px} .card-title{font-size:22px} .result-card{padding:30px 24px} .cards-row{flex-direction:column;align-items:center;gap:20px} .reroll-btn{padding:18px 44px;font-size:16px} .card-desc{max-width:260px} }
+        @media (max-width:600px) { .tagline{font-size:28px;margin-bottom:35px} .logo-btn{width:120px;height:120px} .pulse-ring{width:140px;height:140px} .card-title{font-size:22px} .result-card{padding:30px 24px} .cards-row{flex-direction:column;align-items:center;gap:20px} .reroll-btn{padding:18px 44px;font-size:16px} }
     </style>
 </head>
 <body>
@@ -71,6 +71,118 @@
             <button class="reroll-btn" onclick="reroll()">🎲 한번 더 돌리기</button>
         </div>
     </div>
-    <script>const R=[{e:"🧘",t:"5분 명상하기",d:"눈을 감고 호흡에 집중해보세요. 들숨과 날숨을 천천히 느끼며 마음을 비워보세요."},{e:"🚶",t:"산책 나가기",d:"가까운 공원이나 골목길을 걸어보세요. 바람과 햇살이 기분을 전환시켜 줄 거예요."},{e:"☕",t:"따뜻한 차 한 잔",d:"좋아하는 차를 천천히 우려내며 여유를 즐겨보세요."},{e:"📖",t:"책 한 페이지 읽기",d:"어렵지 않은 책을 펴고 한 페이지만 읽어보세요."},{e:"🎨",t:"낙서 그리기",d:"종이 위에 자유롭게 그림을 그려보세요."},{e:"🌿",t:"식물 돌보기",d:"화분에 물을 주고 잎을 닦아주세요."},{e:"🛁",t:"따뜻한 샤워하기",d:"따뜻한 물로 몸을 감싸며 하루의 피로를 씬어내 보세요."},{e:"🌅",t:"하늘 바라보기",d:"창문 밖 하늘을 5분만 바라보세요."},{e:"😴",t:"10분 낮잠 자기",d:"알람을 10분 후로 맞추고 편하게 눈을 감아보세요."},{e:"🎧",t:"좋아하는 노래 따라 부르기",d:"이어폰을 끼고 좋아하는 노래를 작게 따라 불러보세요."},{e:"✍️",t:"감사한 것 3가지 적기",d:"작은 것이라도 괜찮아요. 감사한 것을 적다 보면 마음이 따뜻해집니다."},{e:"🧸",t:"좋아하는 영상 보기",d:"짧은 힘링 영상을 보며 잠시 웃어보세요."},{e:"💆",t:"셀프 마사지하기",d:"관자놀이와 목, 어깨를 천천히 눌러주세요."},{e:"🌙",t:"조용한 음악 듣기",d:"아무 생각 없이 조용한 음악에 귀를 기울여보세요."}];const M=[{t:"Weightless",a:"Marconi Union"},{t:"Clair de Lune",a:"Debussy"},{t:"Sunset Lover",a:"Petit Biscuit"},{t:"River Flows in You",a:"Yiruma"},{t:"Experience",a:"Ludovico Einaudi"},{t:"Bloom",a:"The Paper Kites"},{t:"Gymnopédie No.1",a:"Erik Satie"},{t:"Kiss the Rain",a:"Yiruma"},{t:"Nuvole Bianche",a:"Ludovico Einaudi"},{t:"Blue",a:"Keshi"},{t:"Snowfall",a:"Øneheart"},{t:"Dandelions",a:"Ruth B."},{t:"봄날",a:"BTS"},{t:"Through the Night",a:"IU"}];let lr=-1,lm=-1,iT=null;function rT(){if(iT)clearTimeout(iT);iT=setTimeout(()=>{const s=document.getElementById('start-screen'),r=document.getElementById('result-screen');if(r.style.display==='flex'){r.style.display='none';s.style.display='flex';s.style.animation='none';void s.offsetWidth;s.style.animation='fadeIn 1s ease'}},30000)}['click','touchstart','keydown','mousemove','scroll'].forEach(e=>document.addEventListener(e,rT,{passive:true}));function gi(a,l){let i;do{i=Math.floor(Math.random()*a.length)}while(i===l&&a.length>1);return i}function roll(){const b=document.getElementById('diceBtn');b.classList.add('rolling');setTimeout(()=>{b.classList.remove('rolling');show()},500)}function show(){const s=document.getElementById('start-screen'),r=document.getElementById('result-screen');const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;const re=R[i],mu=M[j];document.getElementById('restEmoji').textContent=re.e;document.getElementById('restTitle').textContent=re.t;document.getElementById('restDesc').textContent=re.d;document.getElementById('musicTitle').textContent=mu.t;document.getElementById('musicArtist').textContent=mu.a;s.style.display='none';r.style.display='flex';rT();r.querySelectorAll('.result-card').forEach(c=>{c.classList.remove('show');void c.offsetWidth;c.classList.add('show')});const ba=r.querySelector('.bottom-area');ba.style.animation='none';void ba.offsetWidth;ba.style.animation='fadeIn 0.5s ease 0.6s forwards';ba.style.opacity='0'}function reroll(){const r=document.getElementById('result-screen');const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;const re=R[i],mu=M[j];rT();const cards=r.querySelectorAll('.result-card');cards.forEach(c=>c.classList.remove('show'));setTimeout(()=>{document.getElementById('restEmoji').textContent=re.e;document.getElementById('restTitle').textContent=re.t;document.getElementById('restDesc').textContent=re.d;document.getElementById('musicTitle').textContent=mu.t;document.getElementById('musicArtist').textContent=mu.a;cards.forEach(c=>{void c.offsetWidth;c.classList.add('show')})},300)}</script>
+    <script>
+const R=[
+{e:"🧘",t:"5분 명상하기",d:"눈을 감고 호흡에 집중하며 마음을 비워보세요."},
+{e:"🚶",t:"산책 나가기",d:"가까운 공원이나 골목길을 천천히 걸어보세요."},
+{e:"☕",t:"따뜻한 차 한 잔",d:"좋아하는 차를 우려내며 여유를 즐겨보세요."},
+{e:"📖",t:"책 한 페이지 읽기",d:"부담 없는 책을 펴고 한 페이지만 읽어보세요."},
+{e:"🎨",t:"낙서 그리기",d:"종이 위에 자유롭게 그림을 그려보세요."},
+{e:"🌿",t:"식물 돌보기",d:"화분에 물을 주고 잎을 닦아주세요."},
+{e:"🛁",t:"따뜻한 샤워하기",d:"따뜻한 물로 하루의 피로를 씻어내 보세요."},
+{e:"🌅",t:"하늘 바라보기",d:"창문 밖 하늘을 5분만 바라보세요."},
+{e:"😴",t:"10분 낮잠 자기",d:"알람을 맞추고 편하게 눈을 감아보세요."},
+{e:"🎧",t:"좋아하는 노래 따라 부르기",d:"이어폰 끼고 좋아하는 노래를 따라 불러보세요."},
+{e:"✍️",t:"감사한 것 3가지 적기",d:"작은 것이라도 적어보면 마음이 따뜻해져요."},
+{e:"🧸",t:"좋아하는 영상 보기",d:"짧은 힐링 영상을 보며 잠시 웃어보세요."},
+{e:"💆",t:"셀프 마사지하기",d:"관자놀이와 목, 어깨를 천천히 눌러주세요."},
+{e:"🌙",t:"조용한 음악 듣기",d:"아무 생각 없이 음악에 귀를 기울여보세요."},
+{e:"🫧",t:"비눗방울 불기",d:"동심으로 돌아가 비눗방울을 불어보세요."},
+{e:"🕯️",t:"캔들 켜고 멍때리기",d:"불꽃을 바라보며 아무 생각도 하지 마세요."},
+{e:"📸",t:"창밖 사진 찍기",d:"지금 보이는 풍경을 한 장 담아보세요."},
+{e:"🧁",t:"간식 만들어 먹기",d:"간단한 간식을 직접 만들어 즐겨보세요."},
+{e:"✉️",t:"친구에게 안부 보내기",d:"오랜만에 연락 못한 친구에게 한마디 건네보세요."},
+{e:"🧩",t:"퍼즐 맞추기",d:"간단한 퍼즐로 머리를 환기시켜 보세요."},
+{e:"🎹",t:"악기 연주해보기",d:"서툴러도 괜찮아요. 소리를 내보는 것만으로 충분해요."},
+{e:"🧶",t:"뜨개질하기",d:"반복적인 손동작이 마음을 차분하게 해줘요."},
+{e:"📝",t:"일기 쓰기",d:"오늘 하루를 짧게라도 기록해보세요."},
+{e:"🌸",t:"꽃 구경하기",d:"가까운 곳에서 피어난 꽃을 찾아보세요."},
+{e:"🫖",t:"허브차 마시기",d:"캐모마일이나 페퍼민트 한 잔 어떨까요."},
+{e:"🎐",t:"바람 소리 듣기",d:"창문을 열고 바깥 소리에 귀를 기울여보세요."},
+{e:"🖍️",t:"컬러링북 색칠하기",d:"색을 칠하며 잡생각을 내려놓아 보세요."},
+{e:"🤸",t:"가벼운 스트레칭",d:"굳은 몸을 천천히 풀어주세요."},
+{e:"🧊",t:"찬물로 세수하기",d:"시원한 물로 얼굴을 씻으면 기분이 맑아져요."},
+{e:"🍳",t:"좋아하는 요리 하기",d:"만들고 싶었던 음식에 도전해보세요."},
+{e:"🎯",t:"종이비행기 접어 날리기",d:"접어서 날려보는 것만으로도 기분 전환이 돼요."},
+{e:"🌊",t:"파도 소리 틀어놓기",d:"자연의 소리가 마음을 편안하게 해줘요."},
+{e:"🪴",t:"화분 분갈이 하기",d:"식물에게 새 집을 마련해주세요."},
+{e:"📮",t:"엽서 쓰기",d:"누군가에게 짧은 손편지를 써보세요."},
+{e:"🫶",t:"좋아하는 향수 뿌리기",d:"좋아하는 향기로 기분을 전환해보세요."},
+{e:"🎭",t:"재밌는 영화 한 편",d:"가볍고 유쾌한 영화로 기분 전환해보세요."},
+{e:"🧃",t:"과일 주스 만들기",d:"신선한 과일로 즉석 주스를 만들어보세요."},
+{e:"🐾",t:"반려동물 쓰다듬기",d:"옆에 있는 반려동물을 꼭 안아주세요."},
+{e:"🎪",t:"새로운 취미 검색하기",d:"해보고 싶던 취미를 검색해보세요."},
+{e:"🧠",t:"마인드맵 그리기",d:"머릿속 생각을 종이 위에 펼쳐보세요."},
+{e:"🏖️",t:"여행지 사진 구경하기",d:"가고 싶은 곳의 사진을 보며 상상해보세요."},
+{e:"🫁",t:"깊은 호흡 10번",d:"4초 들이쉬고 7초 내쉬기를 반복해보세요."},
+{e:"🌻",t:"창가에 앉아있기",d:"햇빛을 받으며 잠시 가만히 앉아보세요."},
+{e:"🎶",t:"콧노래 흥얼거리기",d:"떠오르는 멜로디를 가볍게 흥얼거려보세요."},
+{e:"🧹",t:"책상 정리하기",d:"깔끔한 공간이 마음도 정리해줘요."},
+{e:"🍵",t:"말차 라떼 만들기",d:"따뜻한 말차 한 잔으로 여유를 느껴보세요."},
+{e:"🌈",t:"좋았던 기억 떠올리기",d:"행복했던 순간을 떠올리며 미소 지어보세요."},
+{e:"📻",t:"라디오 듣기",d:"랜덤 라디오 채널을 틀어보세요."},
+{e:"🧘‍♀️",t:"요가 한 동작",d:"간단한 요가 자세 하나만 따라 해보세요."},
+{e:"🎒",t:"내일 가방 미리 싸기",d:"내일을 준비하면 마음이 한결 가벼워져요."}
+];
+const M=[
+{t:"Weightless",a:"Marconi Union"},
+{t:"Clair de Lune",a:"Debussy"},
+{t:"Sunset Lover",a:"Petit Biscuit"},
+{t:"River Flows in You",a:"Yiruma"},
+{t:"Experience",a:"Ludovico Einaudi"},
+{t:"Bloom",a:"The Paper Kites"},
+{t:"Gymnopédie No.1",a:"Erik Satie"},
+{t:"Kiss the Rain",a:"Yiruma"},
+{t:"Nuvole Bianche",a:"Ludovico Einaudi"},
+{t:"Blue",a:"Keshi"},
+{t:"Snowfall",a:"Øneheart"},
+{t:"Dandelions",a:"Ruth B."},
+{t:"봄날",a:"BTS"},
+{t:"Through the Night",a:"IU"},
+{t:"Strawberry Moon",a:"IU"},
+{t:"Fly Me to the Moon",a:"Frank Sinatra"},
+{t:"Falling Slowly",a:"Glen Hansard"},
+{t:"First Love",a:"Nikka Costa"},
+{t:"Lemon Tree",a:"Fool's Garden"},
+{t:"Can't Help Falling in Love",a:"Elvis Presley"},
+{t:"La Vie en Rose",a:"Edith Piaf"},
+{t:"Moon River",a:"Audrey Hepburn"},
+{t:"Here Comes the Sun",a:"The Beatles"},
+{t:"Banana Pancakes",a:"Jack Johnson"},
+{t:"Better Together",a:"Jack Johnson"},
+{t:"Put Your Records On",a:"Corinne Bailey Rae"},
+{t:"Feeling Good",a:"Nina Simone"},
+{t:"What a Wonderful World",a:"Louis Armstrong"},
+{t:"Somewhere Over the Rainbow",a:"Israel Kamakawiwo'ole"},
+{t:"A Thousand Years",a:"Christina Perri"},
+{t:"All of Me",a:"John Legend"},
+{t:"Photograph",a:"Ed Sheeran"},
+{t:"Perfect",a:"Ed Sheeran"},
+{t:"Night Changes",a:"One Direction"},
+{t:"Golden Hour",a:"JVKE"},
+{t:"Heather",a:"Conan Gray"},
+{t:"Stay",a:"The Kid LAROI, Justin Bieber"},
+{t:"좋은 날",a:"IU"},
+{t:"에잇",a:"IU, SUGA"},
+{t:"밤편지",a:"IU"},
+{t:"Palette",a:"IU"},
+{t:"사랑하지 않아",a:"Urban Zakapa"},
+{t:"소우주",a:"BTS"},
+{t:"Love Poem",a:"IU"},
+{t:"나의 사춘기에게",a:"볼빨간사춘기"},
+{t:"여행",a:"볼빨간사춘기"},
+{t:"좋니",a:"윤종신"},
+{t:"너의 의미",a:"IU, 김창완"},
+{t:"Way Back Home",a:"숀 (SHAUN)"},
+{t:"Star",a:"Heize"}
+];
+let lr=-1,lm=-1,iT=null;
+function rT(){if(iT)clearTimeout(iT);iT=setTimeout(()=>{const s=document.getElementById('start-screen'),r=document.getElementById('result-screen');if(r.style.display==='flex'){r.style.display='none';s.style.display='flex';s.style.animation='none';void s.offsetWidth;s.style.animation='fadeIn 1s ease'}},30000)}
+['click','touchstart','keydown','mousemove','scroll'].forEach(e=>document.addEventListener(e,rT,{passive:true}));
+function gi(a,l){let i;do{i=Math.floor(Math.random()*a.length)}while(i===l&&a.length>1);return i}
+function roll(){const b=document.getElementById('diceBtn');b.classList.add('rolling');setTimeout(()=>{b.classList.remove('rolling');show()},500)}
+function show(){const s=document.getElementById('start-screen'),r=document.getElementById('result-screen');const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;const re=R[i],mu=M[j];document.getElementById('restEmoji').textContent=re.e;document.getElementById('restTitle').textContent=re.t;document.getElementById('restDesc').textContent=re.d;document.getElementById('musicTitle').textContent=mu.t;document.getElementById('musicArtist').textContent=mu.a;s.style.display='none';r.style.display='flex';rT();r.querySelectorAll('.result-card').forEach(c=>{c.classList.remove('show');void c.offsetWidth;c.classList.add('show')});const ba=r.querySelector('.bottom-area');ba.style.animation='none';void ba.offsetWidth;ba.style.animation='fadeIn 0.5s ease 0.6s forwards';ba.style.opacity='0'}
+function reroll(){const r=document.getElementById('result-screen');const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;const re=R[i],mu=M[j];rT();const cards=r.querySelectorAll('.result-card');cards.forEach(c=>c.classList.remove('show'));setTimeout(()=>{document.getElementById('restEmoji').textContent=re.e;document.getElementById('restTitle').textContent=re.t;document.getElementById('restDesc').textContent=re.d;document.getElementById('musicTitle').textContent=mu.t;document.getElementById('musicArtist').textContent=mu.a;cards.forEach(c=>{void c.offsetWidth;c.classList.add('show')})},300)}
+    </script>
 </body>
 </html>
