@@ -12,6 +12,73 @@
         body { font-family: 'Noto Sans KR', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .logo { position: fixed; top: 30px; left: 35px; font-size: 18px; font-weight: 900; letter-spacing: 2px; line-height: 1.2; z-index: 100; }
         #start-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 1s ease; }
+        .tagline { font-size: 34px; font-weight: 700; margin-bottom: 50px; letter-spacing: 1px; line-height: 1.6; }
+        .logo-btn { width: 150px; height: 150px; border-radius: 50%; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; position: relative; overflow: hidden; padding: 0; }
+        .logo-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transition: all 0.3s ease; }
+        .logo-btn:hover { transform: scale(1.08); }
+        .logo-btn:hover img { box-shadow: 0 0 30px rgba(102,126,234,0.4); }
+        .logo-btn:active { transform: scale(0.95); }
+        .logo-btn.rolling { animation: shake 0.5s ease; }
+        .start-hint { margin-top: 24px; font-size: 14px; color: #666; letter-spacing: 3px; text-transform: uppercase; }
+        #result-screen { display: none; flex-direction: column; align-items: center; text-align: center; padding: 20px; max-width: 1000px; width: 100%; }
+        .cards-row { display: flex; gap: 30px; width: 100%; justify-content: center; flex-wrap: wrap; }
+        .result-card { background: linear-gradient(145deg, #1a1a2e, #0f0f1a); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 45px 35px; flex: 1; min-width: 300px; max-width: 460px; opacity: 0; transform: translateY(30px); }
+        .result-card.show { animation: slideUp 0.6s ease forwards; }
+        .result-card.delay { animation-delay: 0.2s; }
+        .card-emoji { font-size: 52px; margin-bottom: 18px; }
+        .card-label { font-size: 15px; color: #667eea; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; font-weight: 700; }
+        .card-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; line-height: 1.4; }
+        .card-desc { font-size: 15px; color: #999; line-height: 1.7; }
+        .music-artist { font-size: 15px; color: #999; margin-top: 6px; }
+        .bottom-area { margin-top: 40px; opacity: 0; animation: fadeIn 0.5s ease 0.6s forwards; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+        .add-prompt { font-size: 14px; color: #777; letter-spacing: 0.3px; line-height: 1.6; padding: 16px 30px; border: 1px dashed rgba(255,255,255,0.12); border-radius: 16px; background: rgba(255,255,255,0.02); }
+        .reroll-btn { padding: 20px 52px; border-radius: 50px; background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Noto Sans KR', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px; }
+        .reroll-btn:hover { border-color: #667eea; color: #667eea; transform: scale(1.05); }
+        .reroll-btn:active { transform: scale(0.95); }
+        .bg-glow { position: fixed; width: 300px; height: 300px; border-radius: 50%; filter: blur(120px); opacity: 0.08; pointer-events: none; z-index: 0; }
+        .glow-1 { top: -100px; right: -100px; background: #667eea; }
+        .glow-2 { bottom: -100px; left: -100px; background: #764ba2; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-15deg) scale(1.1)} 40%{transform:rotate(15deg) scale(1.1)} 60%{transform:rotate(-10deg) scale(1.05)} 80%{transform:rotate(10deg) scale(1.05)} }
+        @media (min-width:768px) and (orientation:landscape) { body{overflow-y:auto} .tagline{font-size:42px;margin-bottom:40px} .logo-btn{width:180px;height:180px} #result-screen{padding:20px} .cards-row{flex-wrap:nowrap;gap:36px} .start-hint{font-size:16px;margin-top:30px} .card-title{font-size:30px} .card-label{font-size:16px} }
+        @media (max-width:600px) { .tagline{font-size:28px;margin-bottom:35px} .logo-btn{width:120px;height:120px} .card-title{font-size:22px} .result-card{padding:30px 24px} .cards-row{flex-direction:column;align-items:center;gap:20px} .reroll-btn{padding:18px 44px;font-size:16px} }
+    </style>
+</head>
+<body>
+    <div class="logo">OFF '<br>REST</div>
+    <div class="bg-glow glow-1"></div><div class="bg-glow glow-2"></div>
+    <div id="start-screen">
+        <div class="tagline">Find your rest<br>Feel your rest</div>
+        <button class="logo-btn" id="diceBtn" onclick="roll()"><img src="/icons/icon-512.png" alt="OFFREST"></button>
+        <div class="start-hint">TAP TO OFFREST</div>
+    </div>
+    <div id="result-screen">
+        <div class="cards-row">
+            <div class="result-card" id="restCard"><div class="card-emoji" id="restEmoji"></div><div class="card-label">오늘의 휴식</div><div class="card-title" id="restTitle"></div><div class="card-desc" id="restDesc"></div></div>
+            <div class="result-card delay" id="musicCard"><div class="card-emoji">🎵</div><div class="card-label">추천 음악</div><div class="card-title" id="musicTitle"></div><div class="music-artist" id="musicArtist"></div></div>
+        </div>
+        <div class="bottom-area">
+            <div class="add-prompt">나만의 휴식을 카드에 적어주시면, 이곳에 등록됩니다</div>
+            <button class="reroll-btn" onclick="reroll()">🎲 한번 더 돌리기</button>
+        </div>
+    </div>
+    <script>const R=[{e:"🧘",t:"5분 명상하기",d:"눈을 감고 호흡에 집중해보세요. 들숨과 날숨을 천천히 느끼며 마음을 비워보세요."},{e:"🚶",t:"산책 나가기",d:"가까운 공원이나 골목길을 걸어보세요. 바람과 햇살이 기분을 전환시켜 줄 거예요."},{e:"☕",t:"따뜻한 차 한 잔",d:"좋아하는 차를 천천히 우려내며 여유를 즐겨보세요."},{e:"📖",t:"책 한 페이지 읽기",d:"어렵지 않은 책을 펴고 한 페이지만 읽어보세요."},{e:"🎨",t:"낙서 그리기",d:"종이 위에 자유롭게 그림을 그려보세요."},{e:"🌿",t:"식물 돌보기",d:"화분에 물을 주고 잎을 닦아주세요."},{e:"🛁",t:"따뜻한 샤워하기",d:"따뜻한 물로 몸을 감싸며 하루의 피로를 씬어내 보세요."},{e:"🌅",t:"하늘 바라보기",d:"창문 밖 하늘을 5분만 바라보세요."},{e:"😴",t:"10분 낮잠 자기",d:"알람을 10분 후로 맞추고 편하게 눈을 감아보세요."},{e:"🎧",t:"좋아하는 노래 따라 부르기",d:"이어폰을 끼고 좋아하는 노래를 작게 따라 불러보세요."},{e:"✍️",t:"감사한 것 3가지 적기",d:"작은 것이라도 괜찮아요. 감사한 것을 적다 보면 마음이 따뜻해집니다."},{e:"🧸",t:"좋아하는 영상 보기",d:"짧은 힘링 영상을 보며 잠시 웃어보세요."},{e:"💆",t:"셀프 마사지하기",d:"관자놀이와 목, 어깨를 천천히 눌러주세요."},{e:"🌙",t:"조용한 음악 듣기",d:"아무 생각 없이 조용한 음악에 귀를 기울여보세요."}];const M=[{t:"Weightless",a:"Marconi Union"},{t:"Clair de Lune",a:"Debussy"},{t:"Sunset Lover",a:"Petit Biscuit"},{t:"River Flows in You",a:"Yiruma"},{t:"Experience",a:"Ludovico Einaudi"},{t:"Bloom",a:"The Paper Kites"},{t:"Gymnopédie No.1",a:"Erik Satie"},{t:"Kiss the Rain",a:"Yiruma"},{t:"Nuvole Bianche",a:"Ludovico Einaudi"},{t:"Blue",a:"Keshi"},{t:"Snowfall",a:"Øneheart"},{t:"Dandelions",a:"Ruth B."},{t:"봄날",a:"BTS"},{t:"Through the Night",a:"IU"}];let lr=-1,lm=-1,iT=null;function rT(){if(iT)clearTimeout(iT);iT=setTimeout(()=>{const s=document.getElementById('start-screen'),r=document.getElementById('result-screen');if(r.style.display==='flex'){r.style.display='none';s.style.display='flex';s.style.animation='none';void s.offsetWidth;s.style.animation='fadeIn 1s ease'}},30000)}['click','touchstart','keydown','mousemove','scroll'].forEach(e=>document.addEventListener(e,rT,{passive:true}));function gi(a,l){let i;do{i=Math.floor(Math.random()*a.length)}while(i===l&&a.length>1);return i}function roll(){const b=document.getElementById('diceBtn');b.classList.add('rolling');setTimeout(()=>{b.classList.remove('rolling');show()},500)}function show(){const s=document.getElementById('start-screen'),r=document.getElementById('result-screen');const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;const re=R[i],mu=M[j];document.getElementById('restEmoji').textContent=re.e;document.getElementById('restTitle').textContent=re.t;document.getElementById('restDesc').textContent=re.d;document.getElementById('musicTitle').textContent=mu.t;document.getElementById('musicArtist').textContent=mu.a;s.style.display='none';r.style.display='flex';rT();r.querySelectorAll('.result-card').forEach(c=>{c.classList.remove('show');void c.offsetWidth;c.classList.add('show')});const ba=r.querySelector('.bottom-area');ba.style.animation='none';void ba.offsetWidth;ba.style.animation='fadeIn 0.5s ease 0.6s forwards';ba.style.opacity='0'}function reroll(){const r=document.getElementById('result-screen');const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;const re=R[i],mu=M[j];rT();const cards=r.querySelectorAll('.result-card');cards.forEach(c=>c.classList.remove('show'));setTimeout(()=>{document.getElementById('restEmoji').textContent=re.e;document.getElementById('restTitle').textContent=re.t;document.getElementById('restDesc').textContent=re.d;document.getElementById('musicTitle').textContent=mu.t;document.getElementById('musicArtist').textContent=mu.a;cards.forEach(c=>{void c.offsetWidth;c.classList.add('show')})},300)}</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=yes">
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" href="/offrest.ico">
+    <title>OFFREST</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .logo { position: fixed; top: 30px; left: 35px; font-size: 18px; font-weight: 900; letter-spacing: 2px; line-height: 1.2; z-index: 100; }
+        #start-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: fadeIn 1s ease; }
         .tagline { font-size: 26px; font-weight: 700; margin-bottom: 50px; letter-spacing: -0.5px; line-height: 1.5; }
         .logo-btn { width: 150px; height: 150px; border-radius: 50%; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; position: relative; overflow: hidden; padding: 0; }
         .logo-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transition: all 0.3s ease; }
