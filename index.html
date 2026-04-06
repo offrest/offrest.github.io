@@ -20,19 +20,19 @@
         .logo-btn:active { transform: scale(0.95); }
         .logo-btn.rolling { animation: shake 0.5s ease; }
         .start-hint { margin-top: 24px; font-size: 14px; color: #666; letter-spacing: 3px; text-transform: uppercase; }
-        #result-screen { display: none; flex-direction: column; align-items: center; text-align: center; padding: 20px; max-width: 900px; width: 100%; }
-        .cards-row { display: flex; gap: 20px; width: 100%; justify-content: center; flex-wrap: wrap; }
-        .result-card { background: linear-gradient(145deg, #1a1a2e, #0f0f1a); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 40px 30px; flex: 1; min-width: 280px; max-width: 420px; opacity: 0; transform: translateY(30px); }
+        #result-screen { display: none; flex-direction: column; align-items: center; text-align: center; padding: 20px; max-width: 1000px; width: 100%; }
+        .cards-row { display: flex; gap: 30px; width: 100%; justify-content: center; flex-wrap: wrap; }
+        .result-card { background: linear-gradient(145deg, #1a1a2e, #0f0f1a); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 45px 35px; flex: 1; min-width: 300px; max-width: 460px; opacity: 0; transform: translateY(30px); }
         .result-card.show { animation: slideUp 0.6s ease forwards; }
         .result-card.delay { animation-delay: 0.2s; }
-        .card-emoji { font-size: 48px; margin-bottom: 16px; }
-        .card-label { font-size: 12px; color: #667eea; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; font-weight: 700; }
-        .card-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; line-height: 1.4; }
-        .card-desc { font-size: 14px; color: #999; line-height: 1.7; }
-        .music-artist { font-size: 14px; color: #999; margin-top: 4px; }
-        .bottom-area { margin-top: 30px; opacity: 0; animation: fadeIn 0.5s ease 0.6s forwards; display: flex; flex-direction: column; align-items: center; gap: 16px; }
-        .add-prompt { font-size: 14px; color: #888; letter-spacing: 0.5px; line-height: 1.6; padding: 14px 28px; border: 1px dashed rgba(255,255,255,0.15); border-radius: 16px; background: rgba(255,255,255,0.03); }
-        .reroll-btn { padding: 16px 40px; border-radius: 50px; background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px; }
+        .card-emoji { font-size: 52px; margin-bottom: 18px; }
+        .card-label { font-size: 15px; color: #667eea; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; font-weight: 700; }
+        .card-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; line-height: 1.4; }
+        .card-desc { font-size: 15px; color: #999; line-height: 1.7; }
+        .music-artist { font-size: 15px; color: #999; margin-top: 6px; }
+        .bottom-area { margin-top: 40px; opacity: 0; animation: fadeIn 0.5s ease 0.6s forwards; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+        .add-prompt { font-size: 15px; color: #888; letter-spacing: 0.5px; line-height: 1.6; padding: 16px 30px; border: 1px dashed rgba(255,255,255,0.15); border-radius: 16px; background: rgba(255,255,255,0.03); }
+        .reroll-btn { padding: 20px 52px; border-radius: 50px; background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Noto Sans KR', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px; }
         .reroll-btn:hover { border-color: #667eea; color: #667eea; transform: scale(1.05); }
         .reroll-btn:active { transform: scale(0.95); }
         .bg-glow { position: fixed; width: 300px; height: 300px; border-radius: 50%; filter: blur(120px); opacity: 0.08; pointer-events: none; z-index: 0; }
@@ -41,8 +41,8 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-15deg) scale(1.1)} 40%{transform:rotate(15deg) scale(1.1)} 60%{transform:rotate(-10deg) scale(1.05)} 80%{transform:rotate(10deg) scale(1.05)} }
-        @media (min-width:768px) and (orientation:landscape) { body{overflow-y:auto} .tagline{font-size:32px;margin-bottom:40px} .logo-btn{width:180px;height:180px} #result-screen{padding:15px} .cards-row{flex-wrap:nowrap} .start-hint{font-size:16px;margin-top:30px} }
-        @media (max-width:600px) { .tagline{font-size:20px;margin-bottom:35px} .logo-btn{width:120px;height:120px} .card-title{font-size:20px} .result-card{padding:30px 24px} .cards-row{flex-direction:column;align-items:center} }
+        @media (min-width:768px) and (orientation:landscape) { body{overflow-y:auto} .tagline{font-size:32px;margin-bottom:40px} .logo-btn{width:180px;height:180px} #result-screen{padding:20px} .cards-row{flex-wrap:nowrap;gap:36px} .start-hint{font-size:16px;margin-top:30px} .card-title{font-size:30px} .card-label{font-size:16px} }
+        @media (max-width:600px) { .tagline{font-size:20px;margin-bottom:35px} .logo-btn{width:120px;height:120px} .card-title{font-size:22px} .result-card{padding:30px 24px} .cards-row{flex-direction:column;align-items:center;gap:20px} .reroll-btn{padding:18px 44px;font-size:16px} }
     </style>
 </head>
 <body>
@@ -59,7 +59,7 @@
             <div class="result-card delay" id="musicCard"><div class="card-emoji">🎵</div><div class="card-label">추천 음악</div><div class="card-title" id="musicTitle"></div><div class="music-artist" id="musicArtist"></div></div>
         </div>
         <div class="bottom-area">
-            <div class="add-prompt">휴식방법과 음악을 카드에 적어 추가해주세요</div>
+            <div class="add-prompt">이곳에 휴식방법과 음악을 카드에 적어 추가됩니다</div>
             <button class="reroll-btn" onclick="reroll()">🎲 한번 더 돌리기</button>
         </div>
     </div>
