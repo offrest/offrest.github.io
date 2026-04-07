@@ -1,799 +1,92 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=yes">
-    <meta name="theme-color" content="#000000">
-    <link rel="icon" href="/offrest.ico">
-    <title>OFFREST</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #000000;
-            color: #ffffff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Noise texture overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 1px, transparent 2px),
-                repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 1px, transparent 2px);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* Floating particles background */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            background: radial-gradient(circle, rgba(255,255,255,0.6), rgba(255,255,255,0.1));
-            border-radius: 50%;
-            opacity: 0.15;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.1; }
-            50% { transform: translateY(-50px) translateX(30px); opacity: 0.3; }
-        }
-
-        .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; top: 20%; animation: float 8s ease-in-out infinite; }
-        .particle:nth-child(2) { width: 6px; height: 6px; left: 80%; top: 10%; animation: float 10s ease-in-out infinite 1s; }
-        .particle:nth-child(3) { width: 3px; height: 3px; left: 20%; top: 80%; animation: float 9s ease-in-out infinite 2s; }
-        .particle:nth-child(4) { width: 5px; height: 5px; left: 70%; top: 70%; animation: float 11s ease-in-out infinite 1.5s; }
-        .particle:nth-child(5) { width: 4px; height: 4px; left: 30%; top: 40%; animation: float 7s ease-in-out infinite 2.5s; }
-        .particle:nth-child(6) { width: 3px; height: 3px; left: 60%; top: 30%; animation: float 12s ease-in-out infinite 0.5s; }
-        .particle:nth-child(7) { width: 5px; height: 5px; left: 15%; top: 60%; animation: float 8.5s ease-in-out infinite 3s; }
-        .particle:nth-child(8) { width: 4px; height: 4px; left: 85%; top: 50%; animation: float 10.5s ease-in-out infinite 1.2s; }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        /* Start Screen */
-        .start-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            opacity: 1;
-            transition: opacity 0.5s ease;
-            z-index: 10;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .start-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .tagline {
-            font-size: 2.5rem;
-            font-weight: 300;
-            letter-spacing: 1px;
-            margin-bottom: 60px;
-            line-height: 1.4;
-        }
-
-        .logo-btn-wrap { position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto 40px; }
-        .logo-button {
-            width: 150px; height: 150px; border-radius: 50%; background: transparent; border: none;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease; position: relative; overflow: hidden; padding: 0; z-index: 2;
-        }
-        .logo-button:hover { transform: scale(1.08); }
-        .logo-button:hover img { box-shadow: 0 0 30px rgba(102,126,234,0.4); }
-        .logo-button:active { transform: scale(0.95); }
-        .logo-button.rolling { animation: shake 0.5s ease; }
-        .pulse-ring {
-            position: absolute; width: 170px; height: 170px; border-radius: 50%;
-            border: 2px solid rgb(255 54 201 / 30%) animation: pulse 2s ease-out infinite; pointer-events: none;
-        }
-        .pulse-ring:nth-child(2) { animation-delay: 0.6s; }
-        .pulse-ring:nth-child(3) { animation-delay: 1.2s; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.5); opacity: 0; } }
-        @keyframes shake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-15deg) scale(1.1)} 40%{transform:rotate(15deg) scale(1.1)} 60%{transform:rotate(-10deg) scale(1.05)} 80%{transform:rotate(10deg) scale(1.05)} }
-
-        .tap-text {
-            font-size: 1rem;
-            letter-spacing: 2px;
-            opacity: 0.7;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        /* Result Screen */
-        .result-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-            width: 100%;
-            max-width: 1200px;
-            z-index: 10;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .result-screen.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .result-cards {
-            display: flex;
-            gap: 24px;
-            width: 100%;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px 32px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            flex: 1;
-            min-width: 280px;
-            max-width: 550px;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        .card.show { animation: slideUp 0.6s ease forwards; }
-        .card:nth-child(2).show { animation-delay: 0.15s; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.1);
-        }
-
-        .card-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: #667eea;
-            margin-bottom: 14px;
-            font-weight: 700;
-        }
-
-        .card-title {
-            font-size: 1.8rem;
-            font-weight: 400;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-        ; word-break: keep-all; overflow-wrap: break-word}
-
-        .card-emoji {
-            font-size: 2.5rem;
-            margin-right: 12px;
-            display: inline-block;
-        }
-
-        .card-description {
-            font-size: 0.95rem;
-            opacity: 0.8;
-            line-height: 1.6;
-            margin-top: 15px;
-        ; word-break: keep-all; overflow-wrap: break-word}
-
-        .bottom-prompt {
-            text-align: center;
-            font-size: 1.2rem;
-            opacity: 0.6;
-            margin: 70px 0px;
-            animation: breathe 3s ease-in-out infinite;
-        }
-
-        @keyframes breathe {
-            0%, 100% {
-                opacity: 0.4;
-            }
-            50% {
-                opacity: 0.8;
-            }
-        }
-
-        .reroll-button {
-            background: rgba(102, 126, 234, 0.2);
-            border: 1px solid rgba(102, 126, 234, 0.5);
-            color: #ffffff;
-            padding: 12px 40px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            margin: 20px auto 0;
-            display: block;
-        }
-
-        .reroll-button:hover {
-            background: rgba(102, 126, 234, 0.3);
-            border-color: rgba(102, 126, 234, 0.8);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 600px) {
-            .tagline {
-                font-size: 1.8rem;
-                margin-bottom: 50px;
-            }
-            .result-cards {
-                flex-direction: column;
-                align-items: center;
-            }
-            .card-title {
-                font-size: 1.5rem;
-            }
-
-            .logo-button {
-                width: 120px;
-                height: 120px;
-            }
-
-            .pulse-ring {
-                width: 140px;
-                height: 140px;
-            }
-        }
-    /* 버튼클릭 css 변경 JD260407 */
-        .logo-button {
-            width: 150px; height: 150px; border-radius: 50%; background: transparent; border: none;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease; position: relative; overflow: hidden; padding: 0; z-index: 2;
-            
-            
-            outline: none; 
-            -webkit-tap-highlight-color: transparent; /* 모바일 터치 시 네모난 회색/파란색 배경 제거 */
-            -webkit-appearance: none; 
-            user-select: none; /* 텍스트 선택 방지 */
-        }
-        .logo-button:focus { 
-            outline: none; 
-        }
-        .logo-button:hover { transform: scale(1.08); }
-        .logo-button:hover img { box-shadow: 0 0 30px rgba(102,126,234,0.4); }
-        .logo-button:active { 
-            transform: scale(0.95); 
-            /* 클릭 시 원형 그림자를 살짝 줘서 동그란 버튼이 눌리는 느낌을 강조 */
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.3); 
-        }
-        .logo-button.rolling { animation: shake 0.5s ease; } 
-    /* 버튼클릭 css 변경 JD260407 */
-    </style>
-</head>
-<body>
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
-
-    <div class="container">
-        <!-- Start Screen -->
-        <div class="start-screen" id="startScreen">
-            <div class="tagline">Find your rest<br>Feel your rest</div>
-            <div class="logo-btn-wrap">
-                <div class="pulse-ring"></div>
-                <div class="pulse-ring"></div>
-                <div class="pulse-ring"></div>
-            <button class="logo-button" id="logoButton"><img src="/icons/icon-512.png" alt="OFFREST" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></button>
-                
-            </div>
-            <div class="tap-text">TAP TO OFFREST</div>
-        </div>
-
-        <!-- Result Screen -->
-        <div class="result-screen" id="resultScreen">
-            <div class="result-cards">
-                <!-- Rest Activity Card -->
-                <div class="card">
-                    <div class="card-label">오늘의 휴식</div>
-                    <div class="card-title">
-                        <span class="card-emoji" id="restEmoji">☕</span><span id="restTitle">핸드드립 한 잔의 여유</span>
-                    </div>
-                    <div class="card-description" id="restDesc">원두 향을 마윌며 천천히 내려보세요.</div>
-                </div>
-
-                <!-- Music Card -->
-                <div class="card">
-                    <div class="card-label">추천 음악</div>
-                    <div class="card-title">
-                        <span class="card-emoji">🎵</span><span id="musicTitle">Song Title</span>
-                    </div>
-                    <div class="card-description" id="musicArtist">Artist Name</div>
-                </div>
-            </div>
-
-            <div class="bottom-prompt">나만의 휴식을 카드에 적어주시면, 이곳에 등록됩니다</div>
-            <button class="reroll-button" id="rerollButton">🎲 한번 더 돌리기</button>
-        </div>
-    </div>
-
-    <script>
-        // Rest Activities (50 items)
-        const R = [
-            {e:"☕",t:"핸드드립 한 잔의 여유",d:"원두 향을 맡으며 천천히 내려보세요."},
-            {e:"🌙",t:"창가에서 멍때리기",d:"아무 생각 없이 바깥을 바라보세요."},
-            {e:"📖",t:"책 한 문장만 읽기",d:"좋아하는 구절 하나만 천천히 읽어보세요."},
-            {e:"🎵",t:"재즈에 몸 맡기기",d:"눈을 감고 재즈 선율에 빠져보세요."},
-            {e:"✍️",t:"오늘의 감정 한 줄 적기",d:"지금 느끼는 감정을 한 줄로 적어보세요."},
-            {e:"🕯️",t:"향기로운 공간에 머물기",d:"좋아하는 향이 있는 곳에서 쉬어보세요."},
-            {e:"🌿",t:"식물 잎사귀 만져보기",d:"초록 잎의 질감을 손끝으로 느껴보세요."},
-            {e:"💭",t:"5분간 공상하기",d:"어디론가 떠나는 상상을 해보세요."},
-            {e:"🎨",t:"의미 없는 선 그리기",d:"펜을 들고 자유롭게 선을 그어보세요."},
-            {e:"😌",t:"깊은 숨 세 번",d:"천천히 들이쉬고 길게 내쉬어보세요."},
-            {e:"🌅",t:"노을뷰 감상하기",d:"하늘의 색이 변하는 순간을 담아보세요."},
-            {e:"📸",t:"일상의 한 컷 찍기",d:"지금 이 순간을 사진 한 장으로 남겨보세요."},
-            {e:"🎧",t:"좋아하는 곡 한 곡만",d:"이어폰을 끼고 딱 한 곡만 집중해보세요."},
-            {e:"🌸",t:"꽃향기 맡아보기",d:"가까운 곳의 꽃 한 송이에 코를 대보세요."},
-            {e:"📝",t:"고마운 사람 이름 적기",d:"떠오르는 고마운 사람을 적어보세요."},
-            {e:"🍃",t:"바람의 온도 느끼기",d:"창문을 열고 바람의 온도를 느껴보세요."},
-            {e:"🌊",t:"파도 소리에 잠기기",d:"자연의 소리로 마음을 가라앉혀보세요."},
-            {e:"💆",t:"관자놀이 지그시 누르기",d:"양쪽 관자놀이를 천천히 눌러주세요."},
-            {e:"🎹",t:"피아노 선율 따라가기",d:"피아노 음 하나하나를 귀로 쫓아보세요."},
-            {e:"🌙",t:"달빛 아래 서보기",d:"밤하늘의 달을 올려다보세요."},
-            {e:"🍵",t:"따뜻한 것 손으로 감싸기",d:"따뜻한 잔을 두 손으로 감싸보세요."},
-            {e:"✉️",t:"나에게 편지 쓰기",d:"미래의 나에게 짧은 편지를 써보세요."},
-            {e:"🔮",t:"오늘의 색깔 정하기",d:"오늘 나의 기분을 색으로 표현해보세요."},
-            {e:"🌈",t:"좋았던 순간 리플레이",d:"최근 행복했던 장면을 떠올려보세요."},
-            {e:"📻",t:"모르는 라디오 채널 듣기",d:"처음 듣는 라디오 채널을 틀어보세요."},
-            {e:"🎭",t:"표정 없이 1분 버티기",d:"무표정으로 1분, 그리고 미소 지어보세요."},
-            {e:"🌻",t:"햇살 한 줌 받기",d:"햇빛이 닿는 곳에 잠시 머물러보세요."},
-            {e:"🍰",t:"달콤한 한 입의 위로",d:"좋아하는 디저트 한 입을 음미해보세요."},
-            {e:"📮",t:"엽서에 마음 담기",d:"짧은 엽서에 진심을 한 줄 적어보세요."},
-            {e:"🎶",t:"콧노래로 흘러가기",d:"떠오르는 멜로디를 가볍게 흥얼거려보세요."},
-            {e:"🛋️",t:"가장 편한 자세 찾기",d:"온몸의 힘을 빼고 편한 자세를 찾아보세요."},
-            {e:"💐",t:"아무 이유 없이 웃기",d:"그냥 한번 웃어보세요. 이유는 나중에."},
-            {e:"🌱",t:"자라나는 것 관찰하기",d:"식물이 자라는 모습을 가만히 지켜보세요."},
-            {e:"📖",t:"시 한 편 읽기",d:"짧은 시 한 편으로 마음을 채워보세요."},
-            {e:"🎐",t:"바람에 흔들리는 것 보기",d:"바람에 흔들리는 무언가를 바라보세요."},
-            {e:"🍳",t:"천천히 요리하기",d:"서두르지 않고 한 접시를 완성해보세요."},
-            {e:"🌌",t:"별자리 찾아보기",d:"밤하늘에서 아는 별자리를 찾아보세요."},
-            {e:"💧",t:"물 한 잔 천천히 마시기",d:"물 한 모금의 시원함을 느껴보세요."},
-            {e:"🎒",t:"내일의 나를 위한 준비",d:"내일 입을 옷을 미리 꺼내보세요."},
-            {e:"🐾",t:"동물 영상 3분 보기",d:"귀여운 동물 영상으로 잠시 녹아보세요."},
-            {e:"🖍️",t:"색연필로 아무거나 칠하기",d:"종이 위에 좋아하는 색을 마구 칠해보세요."},
-            {e:"🌙",t:"어둠 속에 눈 감기",d:"불을 끄고 어둠 속에서 눈을 감아보세요."},
-            {e:"🎧",t:"ASMR로 감각 깨우기",d:"빗소리나 모닥불 소리에 귀를 맡겨보세요."},
-            {e:"🧠",t:"아무 단어나 연상하기",d:"떠오르는 단어를 따라 생각을 흘려보세요."},
-            {e:"🌿",t:"허브 향 맡아보기",d:"로즈마리나 라벤더 향을 들이마셔보세요."},
-            {e:"🎯",t:"종이접기 한 번",d:"종이를 접어 작은 작품을 만들어보세요."},
-            {e:"🌙",t:"조명 낮추고 쉬기",d:"은은한 조명만 남기고 눈을 쉬게 해주세요."},
-            {e:"✨",t:"오늘의 작은 성취 세기",d:"오늘 해낸 작은 일들을 떠올려보세요."},
-            {e:"🎵",t:"카페 BGM에 귀 기울이기",d:"주변의 음악에 온전히 귀를 기울여보세요."},
-            {e:"🌙",t:"내일은 더 좋을 거야",d:"눈을 감고 내일을 기대해보세요."}
-        ];
-
-        // Music (300 items)
-        const M = [
-            {t:"So What",a:"Miles Davis"},
-            {t:"Clair de Lune",a:"Claude Debussy"},
-            {t:"Autumn Leaves",a:"Bill Evans"},
-            {t:"Take Five",a:"Dave Brubeck"},
-            {t:"In a Sentimental Mood",a:"John Coltrane"},
-            {t:"Georgia on My Mind",a:"Norah Jones"},
-            {t:"Spring is Here",a:"Chet Baker"},
-            {t:"Round Midnight",a:"Thelonious Monk"},
-            {t:"Nuages",a:"Django Reinhardt"},
-            {t:"All the Things You Are",a:"Oscar Peterson"},
-            {t:"Girl from Ipanema",a:"Stan Getz"},
-            {t:"Summertime",a:"Billie Holiday"},
-            {t:"Body and Soul",a:"Coleman Hawkins"},
-            {t:"Caravan",a:"Duke Ellington"},
-            {t:"Night and Day",a:"Frank Sinatra"},
-            {t:"The Way You Look Tonight",a:"Ella Fitzgerald"},
-            {t:"Fly Me to the Moon",a:"Frank Sinatra"},
-            {t:"Unforgettable",a:"Nat King Cole"},
-            {t:"Misty",a:"Erroll Garner"},
-            {t:"Chelsea Bridge",a:"Billy Strayhorn"},
-            {t:"Prelude in E Minor",a:"Frédéric Chopin"},
-            {t:"Nocturne No. 2",a:"Frédéric Chopin"},
-            {t:"Gymnopédie No. 1",a:"Erik Satie"},
-            {t:"Gnossienne No. 1",a:"Erik Satie"},
-            {t:"La Cathédrale Engloutie",a:"Claude Debussy"},
-            {t:"Rêverie",a:"Claude Debussy"},
-            {t:"Nocturne No. 1 in B-flat Major",a:"Frédéric Chopin"},
-            {t:"Liebestraum No. 3",a:"Franz Liszt"},
-            {t:"Hungarian Rhapsody No. 2",a:"Franz Liszt"},
-            {t:"Ballad in G Minor",a:"Chopin"},
-            {t:"River Flows in You",a:"Yiruma"},
-            {t:"Kiss the Rain",a:"Yiruma"},
-            {t:"Divenire",a:"Ludovico Einaudi"},
-            {t:"Una Mattina",a:"Ludovico Einaudi"},
-            {t:"Nuvole Bianche",a:"Ludovico Einaudi"},
-            {t:"Mianvelli",a:"Ludovico Einaudi"},
-            {t:"Hurt",a:"Ryuichi Sakamoto"},
-            {t:"Playing the Piano",a:"Ryuichi Sakamoto"},
-            {t:"The Last Emperor Theme",a:"Ryuichi Sakamoto"},
-            {t:"Aqua Fortis",a:"Joe Hisaishi"},
-            {t:"Summer",a:"Joe Hisaishi"},
-            {t:"How Beautiful",a:"George Winston"},
-            {t:"Peace",a:"George Winston"},
-            {t:"December",a:"George Winston"},
-            {t:"Sky",a:"Ryoji Ikeda"},
-            {t:"Sunday Morning",a:"Ólafur Arnalds"},
-            {t:"Re:member",a:"Ólafur Arnalds"},
-            {t:"Saman",a:"Ólafur Arnalds"},
-            {t:"The Chopin Project",a:"Max Richter"},
-            {t:"Departure",a:"Max Richter"},
-            {t:"Sleep",a:"Max Richter"},
-            {t:"Bloom",a:"Tycho"},
-            {t:"Awake",a:"Tycho"},
-            {t:"Dive",a:"Tycho"},
-            {t:"Everyday",a:"Bonobo"},
-            {t:"Kerala",a:"Bonobo"},
-            {t:"Kiara",a:"Bonobo"},
-            {t:"Angel",a:"Thievery Corporation"},
-            {t:"Pigeon",a:"Thievery Corporation"},
-            {t:"Lebanese Blonde",a:"Thievery Corporation"},
-            {t:"Svefn-g-englar",a:"Sigur Rós"},
-            {t:"Starálfur",a:"Sigur Rós"},
-            {t:"Hoppípolla",a:"Sigur Rós"},
-            {t:"Only",a:"Sigur Rós"},
-            {t:"Home",a:"Edward Sharpe & The Magnetic Zeros"},
-            {t:"Lazy",a:"X Ambassadors"},
-            {t:"Crystallized",a:"The xx"},
-            {t:"Islands",a:"The xx"},
-            {t:"Intro",a:"The xx"},
-            {t:"Two Weeks",a:"Grimes"},
-            {t:"Art of Dying",a:"Gnarls Barkley"},
-            {t:"Clandestino",a:"Bonobo"},
-            {t:"Kerala",a:"Tycho"},
-            {t:"Epoch",a:"Tycho"},
-            {t:"Awakening",a:"Ólafur Arnalds"},
-            {t:"Tomorrow",a:"Ólafur Arnalds"},
-            {t:"Island Songs",a:"Ólafur Arnalds"},
-            {t:"Spiral",a:"The Cinematic Orchestra"},
-            {t:"To Build a Home",a:"The Cinematic Orchestra"},
-            {t:"Burning",a:"The Cinematic Orchestra"},
-            {t:"Nuages",a:"Django Reinhardt"},
-            {t:"Minor Blues",a:"Wes Montgomery"},
-            {t:"Four on Six",a:"Wes Montgomery"},
-            {t:"Bumpin on Sunset",a:"Wes Montgomery"},
-            {t:"Maiden Voyage",a:"Herbie Hancock"},
-            {t:"Watermelon Man",a:"Herbie Hancock"},
-            {t:"Cantaloupe Island",a:"Herbie Hancock"},
-            {t:"Pastime Paradise",a:"Stevie Wonder"},
-            {t:"Isn't She Lovely",a:"Stevie Wonder"},
-            {t:"Golden Lady",a:"Stevie Wonder"},
-            {t:"Woman",a:"Doja Cat"},
-            {t:"Bye Bye Bye",a:"Norah Jones"},
-            {t:"Sunrise",a:"Norah Jones"},
-            {t:"Don't Know Why",a:"Norah Jones"},
-            {t:"Feelin' the Same Way",a:"Norah Jones"},
-            {t:"Chasing Pirates",a:"Norah Jones"},
-            {t:"Here We Are",a:"Norah Jones"},
-            {t:"Little Trouble Girl",a:"Norah Jones"},
-            {t:"Cold Cold Cold",a:"Norah Jones"},
-            {t:"The Long Day Is Over",a:"Norah Jones"},
-            {t:"I Can't Make You Love Me",a:"Bonnie Raitt"},
-            {t:"Something to Talk About",a:"Bonnie Raitt"},
-            {t:"Nick of Time",a:"Bonnie Raitt"},
-            {t:"Angel from Montgomery",a:"John Prine"},
-            {t:"That's the Way the World Goes Round",a:"John Prine"},
-            {t:"Bruised Orange",a:"John Prine"},
-            {t:"Breathe Easy",a:"Jackson Browne"},
-            {t:"Doctor Doctor",a:"Jackson Browne"},
-            {t:"The Pretender",a:"Jackson Browne"},
-            {t:"Banana Pancakes",a:"Jack Johnson"},
-            {t:"Better Together",a:"Jack Johnson"},
-            {t:"Good as It Ever Was",a:"Jack Johnson"},
-            {t:"Sitting, Waiting, Wishing",a:"Jack Johnson"},
-            {t:"Badfish",a:"Sublime"},
-            {t:"Chasing Pavements",a:"Adele"},
-            {t:"Rolling in the Deep",a:"Adele"},
-            {t:"Someone Like You",a:"Adele"},
-            {t:"Remedy",a:"Seamus Blake"},
-            {t:"Lazy Afternoon",a:"Chet Baker"},
-            {t:"My Funny Valentine",a:"Chet Baker"},
-            {t:"Peace Piece",a:"Bill Evans"},
-            {t:"Waltz for Debby",a:"Bill Evans"},
-            {t:"But Beautiful",a:"Bill Evans"},
-            {t:"Solitude",a:"Duke Ellington"},
-            {t:"Take the A Train",a:"Duke Ellington"},
-            {t:"Mood Indigo",a:"Duke Ellington"},
-            {t:"A Remark You Made",a:"Bill Evans"},
-            {t:"Quiet Now",a:"Bill Evans"},
-            {t:"Since We Met",a:"Bill Evans"},
-            {t:"Come Away with Me",a:"Norah Jones"},
-            {t:"Be Here to Love Me",a:"Townes Van Zandt"},
-            {t:"Nothin' Left to Lose",a:"Townes Van Zandt"},
-            {t:"To Live is to Fly",a:"Townes Van Zandt"},
-            {t:"The Story",a:"Brandi Carlile"},
-            {t:"Before It Breaks",a:"Brandi Carlile"},
-            {t:"Turpentine",a:"Brandi Carlile"},
-            {t:"Closer to Fine",a:"Indigo Girls"},
-            {t:"Nomads, Indians and Cowboys",a:"Indigo Girls"},
-            {t:"Thornfield",a:"Indigo Girls"},
-            {t:"Teach Your Children",a:"Crosby, Stills & Nash"},
-            {t:"Helplessly Hoping",a:"Crosby, Stills & Nash"},
-            {t:"Suite: Judy Blue Eyes",a:"Crosby, Stills & Nash"},
-            {t:"Acoustic #3",a:"José González"},
-            {t:"Crosses",a:"José González"},
-            {t:"Far Away",a:"José González"},
-            {t:"Heartbeats",a:"José González"},
-            {t:"Cycling Triumphs",a:"José González"},
-            {t:"Veneer",a:"José González"},
-            {t:"Lullaby",a:"The Cure"},
-            {t:"Boys Don't Cry",a:"The Cure"},
-            {t:"A Forest",a:"The Cure"},
-            {t:"Northern Sky",a:"Nick Drake"},
-            {t:"Pink Moon",a:"Nick Drake"},
-            {t:"River Man",a:"Nick Drake"},
-            {t:"Time of No Reply",a:"Nick Drake"},
-            {t:"Hazey",a:"Nick Drake"},
-            {t:"Parasite",a:"Nick Drake"},
-            {t:"Blossom",a:"Nick Drake"},
-            {t:"From the Morning",a:"Nick Drake"},
-            {t:"Skinny Love",a:"Bon Iver"},
-            {t:"Holocene",a:"Bon Iver"},
-            {t:"Flume",a:"Bon Iver"},
-            {t:"For Emma",a:"Bon Iver"},
-            {t:"Self",a:"Bon Iver"},
-            {t:"Creature Fear",a:"Bon Iver"},
-            {t:"Blindsided",a:"Bon Iver"},
-            {t:"The Wolves (Act I and II)",a:"Bon Iver"},
-            {t:"Stalehearted Blues",a:"Iron & Wine"},
-            {t:"Naked As We Came",a:"Iron & Wine"},
-            {t:"Flightless Bird American Mouth",a:"Iron & Wine"},
-            {t:"Sunset Soon Forgotten",a:"Iron & Wine"},
-            {t:"Each Come Together",a:"Iron & Wine"},
-            {t:"Cold Conducive",a:"Iron & Wine"},
-            {t:"Weimers",a:"Iron & Wine"},
-            {t:"Your Hand in Mine",a:"Explosions in the Sky"},
-            {t:"Your Hand in Mine",a:"Godspeed You! Black Emperor"},
-            {t:"A Ghost Story",a:"Fleet Foxes"},
-            {t:"White Winter Hymnal",a:"Fleet Foxes"},
-            {t:"Mykonos",a:"Fleet Foxes"},
-            {t:"Meadowlarks",a:"Fleet Foxes"},
-            {t:"Mountain Sound",a:"Fleet Foxes"},
-            {t:"Tiger Mountain Peasant Song",a:"Fleet Foxes"},
-            {t:"Helplessness Blues",a:"Fleet Foxes"},
-            {t:"Holocene",a:"Fleet Foxes"},
-            {t:"Chicago",a:"Sufjan Stevens"},
-            {t:"Fourth of July",a:"Sufjan Stevens"},
-            {t:"To Be Alone With You",a:"Sufjan Stevens"},
-            {t:"The Only Thing",a:"Sufjan Stevens"},
-            {t:"Death With Dignity",a:"Sufjan Stevens"},
-            {t:"Carrie & Lowell",a:"Sufjan Stevens"},
-            {t:"Should Have Known Better",a:"Sufjan Stevens"},
-            {t:"Casimir Pulaski Day",a:"Sufjan Stevens"},
-            {t:"Antônio Carlos Jobim",a:"Wave - The Best of Antonio Carlos Jobim"},
-            {t:"The Girl from Ipanema",a:"João Gilberto"},
-            {t:"Garota de Ipanema",a:"Antônio Carlos Jobim"},
-            {t:"Corcovado",a:"João Gilberto"},
-            {t:"Águas de Março",a:"Tom Jobim"},
-            {t:"Bossa Nova",a:"Stan Getz"},
-            {t:"Samba Dees Days",a:"Stan Getz"},
-            {t:"One Note Samba",a:"Stan Getz"},
-            {t:"Meditation",a:"Stan Getz"},
-            {t:"Desafinado",a:"João Gilberto"},
-            {t:"Eu Sei que Vou te Amar",a:"Tom Jobim"},
-            {t:"Triste",a:"Antonio Carlos Jobim"},
-            {t:"Fabricated Funk",a:"Nujabes"},
-            {t:"Feather",a:"Nujabes"},
-            {t:"Lady Brown",a:"Nujabes"},
-            {t:"Luv(sic)",a:"Nujabes"},
-            {t:"Counting Stars",a:"Nujabes"},
-            {t:"Horizon",a:"Nujabes"},
-            {t:"Flower in the Bloom",a:"Nujabes"},
-            {t:"Reflection Eternal",a:"Nujabes"},
-            {t:"Reflection Eternal",a:"DJ Okawari"},
-            {t:"Flower Dance",a:"DJ Okawari"},
-            {t:"Letter from Childhood",a:"DJ Okawari"},
-            {t:"Lp ~Lovelorn Days~",a:"DJ Okawari"},
-            {t:"Cloud Dream",a:"DJ Okawari"},
-            {t:"Echo",a:"DJ Okawari"},
-            {t:"Blessed",a:"DJ Okawari"},
-            {t:"Tokyo Reverie",a:"DJ Okawari"},
-            {t:"Chilled Beats Vol. 1",a:"Tomppabeats"},
-            {t:"Harbor",a:"Tomppabeats"},
-            {t:"Memory Lane",a:"Tomppabeats"},
-            {t:"Sunday Drive",a:"Tomppabeats"},
-            {t:"Afternoon",a:"Tomppabeats"},
-            {t:"Sleepy Eyes",a:"Tomppabeats"},
-            {t:"Feelings",a:"Tomppabeats"},
-            {t:"New Leaf",a:"Tomppabeats"},
-            {t:"Vines",a:"Idealism"},
-            {t:"Sky",a:"Idealism"},
-            {t:"Path",a:"Idealism"},
-            {t:"Home",a:"Idealism"},
-            {t:"Somewhere",a:"Idealism"},
-            {t:"Dreaming",a:"Idealism"},
-            {t:"Garden",a:"Idealism"},
-            {t:"Memory",a:"Idealism"},
-            {t:"Late Night Drive",a:"Jinsang"},
-            {t:"Reflect",a:"Jinsang"},
-            {t:"Still",a:"Jinsang"},
-            {t:"Horizons",a:"Jinsang"},
-            {t:"Calm Mind",a:"Jinsang"},
-            {t:"Dreams",a:"Jinsang"},
-            {t:"Wake",a:"Jinsang"},
-            {t:"Winter",a:"Jinsang"},
-            {t:"Sunny Side",a:"Kupla"},
-            {t:"Warm",a:"Kupla"},
-            {t:"Gentle",a:"Kupla"},
-            {t:"Flow",a:"Kupla"},
-            {t:"Floating",a:"Kupla"},
-            {t:"Breeze",a:"Kupla"},
-            {t:"Light",a:"Kupla"},
-            {t:"Peace",a:"Kupla"},
-            {t:"Summer Nights",a:"Quickly Quickly"},
-            {t:"Bloom",a:"Quickly Quickly"},
-            {t:"Ease",a:"Quickly Quickly"},
-            {t:"Endless",a:"Quickly Quickly"},
-            {t:"Drift",a:"Quickly Quickly"},
-            {t:"Rest",a:"Quickly Quickly"},
-            {t:"Glow",a:"Quickly Quickly"},
-            {t:"Calm",a:"Quickly Quickly"},
-            {t:"Lost",a:"Blue Wednesday"},
-            {t:"Passage",a:"Blue Wednesday"},
-            {t:"Alone",a:"Blue Wednesday"},
-            {t:"Rain",a:"Blue Wednesday"},
-            {t:"Night",a:"Blue Wednesday"},
-            {t:"Memories",a:"Blue Wednesday"},
-            {t:"Still",a:"Blue Wednesday"},
-            {t:"Sleep",a:"Blue Wednesday"},
-            {t:"Music for Airports",a:"Brian Eno"},
-            {t:"Ambient 1: Music for Airports",a:"Brian Eno"},
-            {t:"Apollo: Atmospheres and Soundtracks",a:"Brian Eno"},
-            {t:"Discreet Music",a:"Brian Eno"},
-            {t:"The Shutov Assembly",a:"Brian Eno"},
-            {t:"Music for Moments",a:"Brian Eno"},
-            {t:"Reflections",a:"Brian Eno"},
-            {t:"Prophecies",a:"Brian Eno"},
-            {t:"Orinoco Flow",a:"Enya"},
-            {t:"May It Be",a:"Enya"},
-            {t:"Only Time",a:"Enya"},
-            {t:"Watermark",a:"Enya"},
-            {t:"Caribbean Blue",a:"Enya"},
-            {t:"Paint the Sky with Stars",a:"Enya"},
-            {t:"Storms in Africa",a:"Enya"},
-            {t:"Sailing",a:"Enya"},
-            {t:"Silk Road",a:"Kitaro"},
-            {t:"Heaven and Earth",a:"Kitaro"},
-            {t:"Tenku",a:"Kitaro"},
-            {t:"Astral Voyage",a:"Kitaro"},
-            {t:"Far Beyond the Clouds",a:"Kitaro"},
-            {t:"Peaceful Valley",a:"Kitaro"},
-            {t:"Sacred Journey",a:"Kitaro"},
-            {t:"Awakening",a:"Kitaro"},
-            {t:"At Last",a:"Yanni"},
-            {t:"Santorini",a:"Yanni"},
-            {t:"Rainfall",a:"Yanni"},
-            {t:"Marrakesh",a:"Yanni"},
-            {t:"Nostalgia",a:"Yanni"},
-            {t:"Until the Last Moment",a:"Yanni"},
-            {t:"Morning Glory",a:"Yanni"},
-            {t:"Night",a:"Yanni"},
-            {t:"Solitude",a:"George Winston"},
-            {t:"Autumn Leaves",a:"George Winston"},
-            {t:"Winter into Spring",a:"George Winston"},
-            {t:"The Falcon and the Dove",a:"George Winston"},
-            {t:"West Timberland Road",a:"George Winston"},
-            {t:"Variations on the Kanon",a:"George Winston"},
-            {t:"Grazing",a:"George Winston"},
-            {t:"Prelude and Nocturne",a:"George Winston"}
-        ];
-
-        let lr=-1,lm=-1,iT=null;
-        function gi(a,l){let i;do{i=Math.floor(Math.random()*a.length)}while(i===l&&a.length>1);return i}
-        function rT(){if(iT)clearTimeout(iT);iT=setTimeout(()=>{const s=document.getElementById('startScreen'),r=document.getElementById('resultScreen');if(r.classList.contains('active')){r.classList.remove('active');s.classList.remove('hidden')}},30000)}
-        ['click','touchstart','keydown','mousemove','scroll'].forEach(e=>document.addEventListener(e,rT,{passive:true}));
-        function roll(){const b=document.getElementById('logoButton');b.classList.add('rolling');setTimeout(()=>{b.classList.remove('rolling');show()},500)}
-        function show(){
-            const s=document.getElementById('startScreen'),r=document.getElementById('resultScreen');
-            const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;
-            const re=R[i],mu=M[j];
-            document.getElementById('restEmoji').textContent=re.e;
-            document.getElementById('restTitle').textContent=re.t;
-            document.getElementById('restDesc').textContent=re.d;
-            document.getElementById('musicTitle').textContent=mu.t;
-            document.getElementById('musicArtist').textContent=mu.a;
-            s.classList.add('hidden');r.classList.add('active');rT();
-            r.querySelectorAll('.card').forEach(c=>{c.classList.remove('show');void c.offsetWidth;c.classList.add('show')});
-        }
-        function reroll(){
-            const r=document.getElementById('resultScreen');
-            const i=gi(R,lr),j=gi(M,lm);lr=i;lm=j;
-            const re=R[i],mu=M[j];rT();
-            const cards=r.querySelectorAll('.card');
-            cards.forEach(c=>c.classList.remove('show'));
-            setTimeout(()=>{
-                document.getElementById('restEmoji').textContent=re.e;
-                document.getElementById('restTitle').textContent=re.t;
-                document.getElementById('restDesc').textContent=re.d;
-                document.getElementById('musicTitle').textContent=mu.t;
-                document.getElementById('musicArtist').textContent=mu.a;
-                cards.forEach(c=>{void c.offsetWidth;c.classList.add('show')});
-            },300);
-        }
-        document.getElementById('logoButton').addEventListener('click', roll);
-        document.getElementById('rerollButton').addEventListener('click', reroll);
-    
-function autoFitCards() {
-  ['restTitle','musicTitle'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    var card = el.closest('.card');
-    if (!card) return;
-    var maxW = card.clientWidth - 80;
-    el.style.fontSize = '';
-    var fs = parseFloat(getComputedStyle(el).fontSize);
-    el.style.whiteSpace = 'nowrap';
-    while (el.scrollWidth > maxW && fs > 16) {
-      fs -= 1;
-      el.style.fontSize = fs + 'px';
-    }
-    if (el.scrollWidth > maxW) {
-      el.style.whiteSpace = 'normal';
-      el.style.fontSize = Math.max(fs, 18) + 'px';
-    }
-  });
+repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 1px, transparent 2px);
+pointer-events: none;
+z-index: -1;
 }
-</script>
-</body>
-</html>
 
-result-screen 클래스에 active 된 후에 상단 왼쪽에 뒤로 가기 버튼 만들어서
-start-screen hide 없애고 메인 노출되게 해줘
+/* Floating particles background */
+.particles {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: 0;
+}
+
+.particle {
+position: absolute;
+background: radial-gradient(circle, rgba(255,255,255,0.6), rgba(255,255,255,0.1));
+border-radius: 50%;
+opacity: 0.15;
+}
+
+@keyframes float {
+0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.1; }
+50% { transform: translateY(-50px) translateX(30px); opacity: 0.3; }
+}
+
+.particle:nth-child(1) { width: 4px; height: 4px; left: 10%; top: 20%; animation: float 8s ease-in-out infinite; }
+.particle:nth-child(2) { width: 6px; height: 6px; left: 80%; top: 10%; animation: float 10s ease-in-out infinite 1s; }
+.particle:nth-child(3) { width: 3px; height: 3px; left: 20%; top: 80%; animation: float 9s ease-in-out infinite 2s; }
+.particle:nth-child(4) { width: 5px; height: 5px; left: 70%; top: 70%; animation: float 11s ease-in-out infinite 1.5s; }
+.particle:nth-child(5) { width: 4px; height: 4px; left: 30%; top: 40%; animation: float 7s ease-in-out infinite 2.5s; }
+.particle:nth-child(6) { width: 3px; height: 3px; left: 60%; top: 30%; animation: float 12s ease-in-out infinite 0.5s; }
+.particle:nth-child(7) { width: 5px; height: 5px; left: 15%; top: 60%; animation: float 8.5s ease-in-out infinite 3s; }
+.particle:nth-child(8) { width: 4px; height: 4px; left: 85%; top: 50%; animation: float 10.5s ease-in-out infinite 1.2s; }
+
+.container {
+position: relative;
+z-index: 1;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 20px;
+}
+
+/* Start Screen */
+.start-screen {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+text-align: center;
+opacity: 1;
+transition: opacity 0.5s ease;
+z-index: 10;
+width: 100%;
+max-width: 600px;
+}
+
+.start-screen.hidden {
+opacity: 0;
+pointer-events: none;
+}
+
+.tagline {
+font-size: 2.5rem;
+font-weight: 300;
+letter-spacing: 1px;
+margin-bottom: 60px;
+line-height: 1.4;
+}
+
+.logo-btn-wrap { position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto 40px; }
+.logo-button {
+width: 150px; height: 150px; border-radius: 50%; background: transparent; border: none;
+cursor: pointer; display: flex; align-items: center; justify-content: center;
+transition: all 0.3s ease; position: relative; overflow: hidden; padding: 0; z-index: 2;
+}
+.logo-button:hover { transform: scale(1.08); }
+.logo-button:hover img { box-shadow: 0 0 30px rgba(102,126,234,0.4); }
+.logo-button:active { transform: scale(0.95); }
+.logo-button.rolling { animation: shake 0.5s ease; }
+.pulse-ring {
+position: absolute; width: 170px; height: 170px; border-radius: 50%;
+            border: 2px solid rgba(102,126,234,0.3); animation: pulse 2s ease-out infinite; pointer-events: none;
+            border: 2px solid rgb(255 54 201 / 30%) animation: pulse 2s ease-out infinite; pointer-events: none;
+}
+.pulse-ring:nth-child(2) { animation-delay: 0.6s; }
+.pulse-ring:nth-child(3) { animation-delay: 1.2s; }
