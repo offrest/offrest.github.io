@@ -147,8 +147,7 @@
             opacity: 1;
             pointer-events: auto;
         }
-
-        /* 데스크탑 환경 (요청하신 기준 코드) */
+        
         .back-button {
             position: fixed;
             bottom: -75px;
@@ -179,21 +178,19 @@
             transform: scale(0.95);
         }
         
-        /* 태블릿 환경 (화면이 1024px 이하로 좁아질 때) */
-        @media (max-width: 1024px) {
+        /* 가로 660px 이하 환경 (요청하신 기준) */
+        @media (max-width: 660px) {
             .back-button {
-                /* left: 570px을 유지하면 화면 밖으로 나가므로 화면 좌측 기준으로 변경 */
-                left: 30px; 
-                /* bottom: -75px일 경우 화면 아래로 잘릴 수 있어 화면 안쪽으로 진입 */
-                bottom: 30px; 
+                bottom: -60px;
+                left: 300px;
             }
         }
         
-        /* 모바일 환경 (화면이 600px 이하로 좁아질 때) */
-        @media (max-width: 600px) {
+        /* 스마트폰 등 가로 480px 이하 환경 (화면 이탈 방지용 안전 코드) */
+        @media (max-width: 480px) {
             .back-button {
-                left: 20px;
                 bottom: 20px;
+                left: 20px;
                 width: 40px;
                 height: 40px;
             }
