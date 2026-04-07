@@ -148,16 +148,16 @@
             pointer-events: auto;
         }
 
-        /* 뒤로 가기 버튼 CSS */
+        /* 데스크탑 기본 설정 (화면 좌측 하단 고정) */
         .back-button {
             position: fixed;
-            top: -150px;
-            left: 30px;
+            bottom: 40px; /* top 대신 bottom을 사용하여 바닥을 기준으로 잡습니다 */
+            left: 40px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #ffffff;
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -170,12 +170,34 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
+        
+        /* 버튼이 하단에 있으므로, 마우스 오버 시 위로 살짝 떠오르는 효과가 더 자연스럽습니다 */
         .back-button:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: translateX(-5px);
+            transform: translateY(-5px); 
         }
         .back-button:active {
             transform: scale(0.95);
+        }
+        
+        /* 태블릿 환경 (화면이 살짝 좁아질 때) */
+        @media (max-width: 1024px) {
+            .back-button {
+                bottom: 30px;
+                left: 30px;
+                width: 48px;
+                height: 48px;
+            }
+        }
+        
+        /* 모바일 환경 (화면이 많이 좁아질 때) */
+        @media (max-width: 600px) {
+            .back-button {
+                bottom: 20px;
+                left: 20px;
+                width: 40px;
+                height: 40px;
+            }
         }
 
         .result-cards {
