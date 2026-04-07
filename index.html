@@ -148,11 +148,11 @@
             pointer-events: auto;
         }
 
-        /* 데스크탑 기본 설정 (화면 좌측 하단 고정) */
+        /* 데스크탑 환경 (요청하신 기준 코드) */
         .back-button {
             position: fixed;
-            bottom: 40px; /* top 대신 bottom을 사용하여 바닥을 기준으로 잡습니다 */
-            left: 40px;
+            bottom: -75px;
+            left: 570px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #ffffff;
@@ -171,30 +171,29 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* 버튼이 하단에 있으므로, 마우스 오버 시 위로 살짝 떠오르는 효과가 더 자연스럽습니다 */
         .back-button:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px); 
+            transform: translateY(-5px);
         }
         .back-button:active {
             transform: scale(0.95);
         }
         
-        /* 태블릿 환경 (화면이 살짝 좁아질 때) */
+        /* 태블릿 환경 (화면이 1024px 이하로 좁아질 때) */
         @media (max-width: 1024px) {
             .back-button {
-                bottom: 30px;
-                left: 30px;
-                width: 48px;
-                height: 48px;
+                /* left: 570px을 유지하면 화면 밖으로 나가므로 화면 좌측 기준으로 변경 */
+                left: 30px; 
+                /* bottom: -75px일 경우 화면 아래로 잘릴 수 있어 화면 안쪽으로 진입 */
+                bottom: 30px; 
             }
         }
         
-        /* 모바일 환경 (화면이 많이 좁아질 때) */
+        /* 모바일 환경 (화면이 600px 이하로 좁아질 때) */
         @media (max-width: 600px) {
             .back-button {
-                bottom: 20px;
                 left: 20px;
+                bottom: 20px;
                 width: 40px;
                 height: 40px;
             }
