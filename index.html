@@ -216,7 +216,7 @@
             font-weight: 400;
             margin-bottom: 12px;
             letter-spacing: 0.5px;
-        }
+        ; word-break: keep-all; overflow-wrap: break-word}
 
         .card-emoji {
             font-size: 2.5rem;
@@ -746,6 +746,26 @@
         }
         document.getElementById('logoButton').addEventListener('click', roll);
         document.getElementById('rerollButton').addEventListener('click', reroll);
-    </script>
+    
+function autoFitCards() {
+  document.querySelectorAll('.card-title').forEach(el => {
+    el.style.fontSize = '';
+    el.style.whiteSpace = 'nowrap';
+    let fs = parseFloat(getComputedStyle(el).fontSize);
+    const maxW = el.parentElement.clientWidth - 40;
+    if (el.scrollWidth > maxW) {
+      while (el.scrollWidth > maxW && fs > 16) {
+        fs -= 1;
+        el.style.fontSize = fs + 'px';
+      }
+      if (el.scrollWidth > maxW) {
+        el.style.whiteSpace = 'normal';
+      }
+    } else {
+      el.style.whiteSpace = 'normal';
+    }
+  });
+}
+</script>
 </body>
 </html>
